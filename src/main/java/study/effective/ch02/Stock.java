@@ -1,9 +1,21 @@
-package study.effective.ch02;
+package ch02;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.IntStream;
-
-public abstract class Stock {
+public abstract class Stock02 {
+	private final int A, B, C;
 	
+	public Stock02() { this(0); }
+	public Stock02(int a) { this(a, 0); }
+	public Stock02(int a, int b) { this(a, b, 0);	}
+	public Stock02(int a, int b, int c) {
+		this.A = a;
+		this.B = b;
+		this.C = c;
+	}
+}
+
+class Stock {
+	public static void main(String[] args) {
+		Stock aaa = new Stock02(1);
+		System.out.println("---------------");
+	}
 }
