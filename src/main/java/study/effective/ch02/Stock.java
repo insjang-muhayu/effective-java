@@ -1,10 +1,12 @@
 package study.effective.ch02;
 
 
-public abstract class Stock {
+public abstract class Stock {	
 	public enum ExchangeType { KOSPI, KOSDAQ, NYSE, NASDAQ } // 거래소
 	public enum NationType { KOR, USA, CHN, JPN, HKG, VNM } // 거래소 국가
 	
+	public abstract ExchangeType getExchange();
+	public abstract NationType getNation();
 	public abstract void whoami();
 	
 	// 2.인스턴스를 새로 생성하지 않아도 됨
@@ -37,9 +39,8 @@ public abstract class Stock {
 			default : throw new IllegalArgumentException("Not found Index Code :" + exchange.name());
 		}
 	}
-	
 	public static Stock from(Stock instant) {
-		switch (instant.get) {
+		switch (instant.getExchange()) {
 			case KOSPI : return new StockKospi();
 			case KOSDAQ : return new StockKosdaq();
 			case NYSE : new StockNyse();
@@ -47,4 +48,5 @@ public abstract class Stock {
 			default : throw new IllegalArgumentException("Not found Index Code :" + exchange.name());
 		}
 	}
+	
 }
