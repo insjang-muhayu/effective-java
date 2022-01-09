@@ -1,7 +1,5 @@
 package study.effective.ch02;
 
-import java.util.Date;
-
 import lombok.Getter;
 import lombok.ToString;
 

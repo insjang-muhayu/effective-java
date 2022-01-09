@@ -45,7 +45,7 @@ public abstract class Stock {
 			case KOSDAQ : return new StockKosdaq();
 			case NYSE : new StockNyse();
 			case NASDAQ : new StockNasdaq();
-			default : throw new IllegalArgumentException("Not found Index Code :" + exchange.name());
+			default : throw new IllegalArgumentException("Not found Index Code :" + instant.getExchange().name());
 		}
 	}
 	
