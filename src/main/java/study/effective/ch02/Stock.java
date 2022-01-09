@@ -48,5 +48,9 @@ public abstract class Stock {
 			default : throw new IllegalArgumentException("Not found Index Code :" + instant.getExchange().name());
 		}
 	}
-	
+
+	public static void main(String[] args) {
+		Stock stock = Stock.instance(Stock.ExchangeType.KOSPI);
+		stock.whoami(); // output : I am Kospi.
+	}
 }
