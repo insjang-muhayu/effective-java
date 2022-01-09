@@ -1,2 +1,6 @@
 [*]
+indent_style = tab
 indent_size = 4
+trim_trailing_whitespace = true
+
+# 가장 확실한 방법은 브라우저 확장도구 'Tab Size on GitHub' 설치

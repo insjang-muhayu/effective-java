@@ -23,7 +23,7 @@ repositories {
 dependencies { // https://mvnrepository.com
     // implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // implementation('org.springframework.boot:spring-boot-starter-mustache')    
+    // implementation('org.springframework.boot:spring-boot-starter-mustache')
     // implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     // developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
@@ -44,6 +44,8 @@ dependencies { // https://mvnrepository.com
     annotationProcessor('org.projectlombok:lombok')
     testImplementation('org.projectlombok:lombok')
     testAnnotationProcessor('org.projectlombok:lombok')
+
+    implementation("com.google.guava:guava:31.0.1-jre")
 }
 
 test {
