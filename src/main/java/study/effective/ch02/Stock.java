@@ -1,11 +1,13 @@
 package study.effective.ch02;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.ToString;
+
+@ToString
 public abstract class Stock {
 	//=========================================================
 	// ITEM-01. [생성자] Static Factory Method를 고려하라.
@@ -53,18 +55,18 @@ public abstract class Stock {
 	//	: 주식 종목을 추가할 수 있는 builder를 만들어 보자
 	//=========================================================
 	abstract static class Builder<T extends Builder<T>> {
-		List<HashMap<String, String>> items = new ArrayList<>();
+		List<StockItem> items = new ArrayList<>();
 
 		abstract Stock build();
 		protected abstract T self(); // 하위클래스에서 this로 재정의 해야함
 
-		public T addItem(HashMap<String, String> item) {
+		public T addItem(StockItem item) {
 			items.add(Objects.requireNonNull(item));
 			return self();
 		}
 	}
 
-	final List<HashMap<String, String>> stockItems;
+	final List<StockItem> stockItems;
 
 
 	Stock() {
@@ -79,7 +81,14 @@ public abstract class Stock {
 	public static void main(String[] args) {
 		Stock stock = Stock.instance(Stock.ExchangeType.KOSPI);
 		stock.whoami(); // output : I am Kospi.
-		// '035420':'naver', '035720':'kakao', '181710':'nhn', '000270':'kia', '010950':'soil',
-		// '005930':'ss_elec', '000660':'sk_hynx', '066570':'lg_elec', '051910':'lg_chem'
+
+
+		StockKospi kospi_my = new StockKospi.Builder()
+			.addItem(new StockItem.Builder("035420", "NAVER").build())
+			.addItem(new StockItem.Builder("035720", "카카오").build())
+			.addItem(new StockItem.Builder("005930", "삼성전자").build())
+			.build();
+
+		System.out.println(kospi_my.stockItems.toString());
 	}
 }
