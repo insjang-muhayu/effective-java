@@ -8,6 +8,8 @@ public class StockKospi extends Stock {
 	@Getter private final ExchangeType exchange = ExchangeType.KOSPI;
 	@Getter private final NationType nation = NationType.KOR;
 
+	StockKospi() { super(); }
+
 	@Override
 	public void whoami() {
 		System.out.println("I am Kospi.");
@@ -15,7 +17,6 @@ public class StockKospi extends Stock {
 
 	//=========================================================
 	// ITEM-02. [생성자: 많은 매개변수] Builder를 고려하라.
-	StockKospi() { super(); }
 	private StockKospi(Builder builder) {
 		super(builder);
 	}

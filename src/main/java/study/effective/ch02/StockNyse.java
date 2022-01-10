@@ -8,6 +8,8 @@ public class StockNyse extends Stock {
 	@Getter private final ExchangeType exchange = ExchangeType.NYSE;
 	@Getter private final NationType nation = NationType.USA;
 
+	StockNyse() { super(); }
+
 	@Override
 	public void whoami() {
 		System.out.println("I am NewYork Stock Exchange.");
@@ -15,7 +17,6 @@ public class StockNyse extends Stock {
 
 	//=========================================================
 	// ITEM-02. [생성자: 많은 매개변수] Builder를 고려하라.
-	StockNyse() { super(); }
 	private StockNyse(Builder builder) {
 		super(builder);
 	}

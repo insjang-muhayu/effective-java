@@ -1,7 +1,16 @@
-# 2장 객체 생성과 파괴
+# 2장. 객체 생성과 파괴
 
-## ITEM-01. [생성자] Static Factory Method를 고려하라.
+- [x] ITEM-01. [Constructor] **Static Factory Method**
+- [x] ITEM-02. [Constructor] **Builder**
+- [x] ITEM-03. [Constructor] **Singleton**
+- [ ] ITEM-04. [Constructor] **Private Constructor**
+- [ ] ITEM-05. [Constructor] **Dependency Injection**
+- [ ] ITEM-06. [Constructor] **Avoid Unnecessary Object**
+- [ ] ITEM-07. [Constructor] **Eliminate Object Reference**
+
+
 -----------------------------------------------------------------
+## ITEM-01. [생성자] Static Factory Method
 ### Static Factory Method 특징
 1. __객체의 특성에 적합한 작명 가능__
 	* `BigInteger(int, int, Random)` -> `BigInteger.probablePrime`
@@ -41,9 +50,8 @@
 * **{Type}** :
 	`List<Complaint> litany = Collectins.list(legacyLitany);`
 
-
-### ITEM-02. [생성자: 많은 매개변수] Builder를 고려하라.
 -----------------------------------------------------------------
+## ITEM-02. [Constructor] Builder
 * __점층적 생성자 패턴 (Telescoping Constructor Pattern)__
 	* 매개변수의 개수/타입로 생성자를 구분하는 방식
 	* 생성자에 필요한 매개변수가 단순할 때 사용 (가장 기초적 생성자 패턴)
@@ -103,7 +111,7 @@
 		3. `build()` 로 최종 객체 얻음
 	* 빌더 패턴 유형
 		* 점층적(Telescoping) 생성자 방식
-			( [StockItem.java](https://github.com/insjang-muhayu/effective-java/blob/main/src/main/java/study/effective/ch02/StockItem.java) )
+			( [StockItem.java](StockItem.java) )
 			```java
 			public class StockItem {
 				private final String ticker;	// 종목코드
@@ -112,7 +120,7 @@
 				public static class Builder {
 					private final String ticker;	// 필수
 					private final String title;		// 선택
-					// 1. builder creator
+					// 1. builder constructor
 					public Builder(String ticker) { this.ticker	= ticker; }
 					// 2. setter method
 					public Builder title(String val) { title = val; return this; }
@@ -130,12 +138,12 @@
 				StockItem naver = new StockItem.Builder("035420") .title("NAVER") .build();
 			```
 		* 계층적(Abstract 사용) 클래스 방식
-			(
-				[Stock.java](https://github.com/insjang-muhayu/effective-java/blob/main/src/main/java/study/effective/ch02/Stock.java) /
-				[StockKospi.java](https://github.com/insjang-muhayu/effective-java/blob/main/src/main/java/study/effective/ch02/StockKospi.java) /
-				[StockKosdaq.java](https://github.com/insjang-muhayu/effective-java/blob/main/src/main/java/study/effective/ch02/StockKosdaq.java) /
-				[StockNyse.java](https://github.com/insjang-muhayu/effective-java/blob/main/src/main/java/study/effective/ch02/StockNyse.java) /
-				[StockNasdaq.java](https://github.com/insjang-muhayu/effective-java/blob/main/src/main/java/study/effective/ch02/StockNasdaq.java)
+			> (
+				[Stock.java](Stock.java) /
+				[StockKospi.java](StockKospi.java) /
+				[StockKosdaq.java](StockKosdaq.java) /
+				[StockNyse.java](StockNyse.java) /
+				[StockNasdaq.java](StockNasdaq.java)
 			)
 
 			<추상 클래스>
@@ -184,4 +192,6 @@
 				.addItem(new StockItem.Builder("005930", "삼성전자").build())
 				.build();
 			```
+-----------------------------------------------------------------
 
+## ITEM-03. [Constructor] Singleton
