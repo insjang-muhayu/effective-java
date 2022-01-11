@@ -7,6 +7,8 @@
 - [ ] ITEM-05. [Constructor] **Dependency Injection**
 - [ ] ITEM-06. [Constructor] **Avoid Unnecessary Object**
 - [ ] ITEM-07. [Constructor] **Eliminate Object Reference**
+- [ ] ITEM-08. [Constructor] **Avoid finalizer and cleaner**
+- [ ] ITEM-09. [Constructor] **try-with-resources**
 
 
 -----------------------------------------------------------------
@@ -34,164 +36,222 @@
 		* API 설명 힌트 지원 안됨 (주석 잘 달아야 함)
 ### Naming Convention
 * **from** :
-	`Date dt = Date.from(instant);`
+	> `Date dt = Date.from(instant);`
 * **of** :
-	`Set<Rank> faceCards = EnumSet.of(JACK, QUEEN, KING);`
+	> `Set<Rank> faceCards = EnumSet.of(JACK, QUEEN, KING);`
 * **valueOf** :
-	`BigInteger prime = BigInteger.valueOf(Integer.MAX_VALUE);`
+	> `BigInteger prime = BigInteger.valueOf(Integer.MAX_VALUE);`
 * **instance** :
-	`StackWalker luke = StackWalker.instance(options);`
+	> `StackWalker luke = StackWalker.instance(options);`
 * **create** :
-	`Object newArray = Array.create(classObject, arrayLen);`
+	> `Object newArray = Array.create(classObject, arrayLen);`
 * **get{Type}** :
-	`FileStore fs = Files.getFileStore(path)`
+	> `FileStore fs = Files.getFileStore(path)`
 * **new{Type}** :
-	`BufferedReader br = Files.newBufferedReader(path);`
+	> `BufferedReader br = Files.newBufferedReader(path);`
 * **{Type}** :
-	`List<Complaint> litany = Collectins.list(legacyLitany);`
+	> `List<Complaint> litany = Collectins.list(legacyLitany);`
 
 -----------------------------------------------------------------
 ## ITEM-02. [Constructor] Builder
-* __점층적 생성자 패턴 (Telescoping Constructor Pattern)__
-	* 매개변수의 개수/타입로 생성자를 구분하는 방식
-	* 생성자에 필요한 매개변수가 단순할 때 사용 (가장 기초적 생성자 패턴)
+### 점층적 생성자 패턴 (Telescoping Constructor Pattern)
+* 매개변수의 개수/타입로 생성자를 구분하는 방식
+* 생성자에 필요한 매개변수가 단순할 때 사용 (가장 기초적 생성자 패턴)
+	```java
+	public abstract class Stock02 {
+		private final int A, B, C;
+		public Stock02(int a) {
+			this(a, 0);
+		}
+		public Stock02(int a, int b) {
+			this(a, b, 0);
+		}
+		public Stock02(int a, int b, int c) {
+			this.A = a; this.B = b; this.C = c;
+		}
+	}
+	```
+
+### 자바빈즈 패턴 (JavaBeans Pattern)
+* MVC의 Model 클래스와 비슷 (Setter/Getter 함수로 이루어짐)
+* 장점 : `점층적 생성자 패턴`에 비해 매개변수 의미 부여 가능
+* 단점 :
+	* 객체 하나 만들기 위해 `setter method` 를 여러번 호출해야 함
+	* 객체 생성 완료 전까지 일관성 깨질수 있음 (심각한 버그 유발)
+	* 일관성 유지를 위해 **Freezing Method** 필요
 		```java
-		public abstract class Stock02 {
-			private final int A, B, C;
-			public Stock02(int a) {
-				this(a, 0);
+		public class FreezingMethod {
+			private String name;
+			private booleam freeze = false;
+
+			public FreezingMethod() {}
+
+			public void setName(String name) {
+				if (isFreezing()) throw new AssertionError("[동결] 불변성(immutable) 유지!!");
+				this.name = name;
 			}
-			public Stock02(int a, int b) {
-				this(a, b, 0);
+			public String getName() { return name; }
+
+			public void freeze() { this.freeze = true; }
+			public boolean isFreezing() { return freeze; }
+		}
+		```
+		```java
+		FreezingMethod A = new FreezingMethod();
+		A.setName("insjang"); A.freeze();
+		A.setName("muhayu"); // 예외발생!!
+		```
+
+### 빌더 패턴 (Builder Pattern)
+* 안전성과 가독성 겸비
+* Builder는 일반적으로 _Static Member Class_ 로 생성
+* `Method Chaining` 혹은 `Fluent API` 형으로 사용 가능
+* 사용 방법 :
+	1. 생성자(필수 매개변수) 호출로 객체 생성
+	2. Builder객체의 `setter method`로 매개변수 설정
+	3. `build()` 로 최종 객체 얻음
+* 빌더 패턴 유형
+	* 점층적(Telescoping) 생성자 방식
+		( [StockItem.java](StockItem.java) )
+		```java
+		public class StockItem {
+			private final String ticker;	// 종목코드
+			private final String title;		// 종목명
+
+			public static class Builder {
+				private final String ticker;	// 필수
+				private final String title;		// 선택
+				// 1. builder constructor
+				public Builder(String ticker) { this.ticker	= ticker; }
+				// 2. setter method
+				public Builder title(String val) { title = val; return this; }
+				// 3. build()
+				public StockItem build() { return new StockItem(this); }
 			}
-			public Stock02(int a, int b, int c) {
-				this.A = a; this.B = b; this.C = c;
+
+			private StockItem(Builder builder) {
+				ticker		= builder.ticker;
+				title		= builder.title;
+			}
+		}
+		```
+		```java
+			StockItem naver = new StockItem.Builder("035420") .title("NAVER") .build();
+		```
+	* 계층적(Abstract 사용) 클래스 방식
+		> (
+			[Stock.java](Stock.java) /
+			[StockKospi.java](StockKospi.java) /
+			[StockKosdaq.java](StockKosdaq.java) /
+			[StockNyse.java](StockNyse.java) /
+			[StockNasdaq.java](StockNasdaq.java)
+		)
+
+		<추상 클래스>
+		```java
+		public abstract class Stock {
+			... 생략 ...
+			abstract static class Builder<T extends Builder<T>> {
+				List<StockItem> items = new ArrayList<>();
+
+				abstract Stock build();
+				protected abstract T self(); // 하위클래스에서 this로 재정의 해야함
+
+				public T addItem(StockItem item) {
+					items.add(Objects.requireNonNull(item));
+					return self();
+				}
+			}
+
+			final List<StockItem> stockItems;
+
+			Stock(Builder<?> builder) {
+				// List는 Deep Copy가 복잡하기 때문에 stream을 사용해서 clone() 대체
+				stockItems = builder.items.stream().collect(Collectors.toList());
+			}
+		}
+		```
+		<하위 클래스>
+		```java
+		public class StockKospi extends Stock {
+			public static class Builder extends Stock.Builder<Builder> {
+				@Override public StockKospi build() { return new StockKospi(this); }
+				@Override protected Builder self() { return this; }
+			}
+
+			private StockKospi(Builder builder) {
+				super(builder);
 			}
 		}
 		```
 
-* __자바빈즈 패턴 (JavaBeans Pattern)__
-	* MVC의 Model 클래스와 비슷 (Setter/Getter 함수로 이루어짐)
-	* 장점 : `점층적 생성자 패턴`에 비해 매개변수 의미 부여 가능
-	* 단점 :
-		* 객체 하나 만들기 위해 `setter method` 를 여러번 호출해야 함
-		* 객체 생성 완료 전까지 일관성 깨질수 있음 (심각한 버그 유발)
-		* 일관성 유지를 위해 **Freezing Method** 필요
-			```java
-			public class FreezingMethod {
-				private String name;
-				private booleam freeze = false;
 
-				public FreezingMethod() {}
-
-				public void setName(String name) {
-					if (isFreezing()) throw new AssertionError("[동결] 불변성(immutable) 유지!!");
-					this.name = name;
-				}
-				public String getName() { return name; }
-
-				public void freeze() { this.freeze = true; }
-				public boolean isFreezing() { return freeze; }
-			}
-			```
-			```java
-			FreezingMethod A = new FreezingMethod();
-			A.setName("insjang"); A.freeze();
-			A.setName("muhayu"); // 예외발생!!
-			```
-
-
-* __빌더 패턴 (Builder Pattern)__
-	* 안전성과 가독성 겸비
-	* Builder는 일반적으로 _Static Member Class_ 로 생성
-	* `Method Chaining` 혹은 `Fluent API` 형으로 사용 가능
-	* 사용 방법 :
-		1. 생성자(필수 매개변수) 호출로 객체 생성
-		2. Builder객체의 `setter method`로 매개변수 설정
-		3. `build()` 로 최종 객체 얻음
-	* 빌더 패턴 유형
-		* 점층적(Telescoping) 생성자 방식
-			( [StockItem.java](StockItem.java) )
-			```java
-			public class StockItem {
-				private final String ticker;	// 종목코드
-				private final String title;		// 종목명
-
-				public static class Builder {
-					private final String ticker;	// 필수
-					private final String title;		// 선택
-					// 1. builder constructor
-					public Builder(String ticker) { this.ticker	= ticker; }
-					// 2. setter method
-					public Builder title(String val) { title = val; return this; }
-					// 3. build()
-					public StockItem build() { return new StockItem(this); }
-				}
-
-				private StockItem(Builder builder) {
-					ticker		= builder.ticker;
-					title		= builder.title;
-				}
-			}
-			```
-			```java
-				StockItem naver = new StockItem.Builder("035420") .title("NAVER") .build();
-			```
-		* 계층적(Abstract 사용) 클래스 방식
-			> (
-				[Stock.java](Stock.java) /
-				[StockKospi.java](StockKospi.java) /
-				[StockKosdaq.java](StockKosdaq.java) /
-				[StockNyse.java](StockNyse.java) /
-				[StockNasdaq.java](StockNasdaq.java)
-			)
-
-			<추상 클래스>
-			```java
-			public abstract class Stock {
-				... 생략 ...
-				abstract static class Builder<T extends Builder<T>> {
-					List<StockItem> items = new ArrayList<>();
-
-					abstract Stock build();
-					protected abstract T self(); // 하위클래스에서 this로 재정의 해야함
-
-					public T addItem(StockItem item) {
-						items.add(Objects.requireNonNull(item));
-						return self();
-					}
-				}
-
-				final List<StockItem> stockItems;
-
-				Stock(Builder<?> builder) {
-					// List는 Deep Copy가 복잡하기 때문에 stream을 사용해서 clone() 대체
-					stockItems = builder.items.stream().collect(Collectors.toList());
-				}
-			}
-			```
-			<하위 클래스>
-			```java
-			public class StockKospi extends Stock {
-				public static class Builder extends Stock.Builder<Builder> {
-					@Override public StockKospi build() { return new StockKospi(this); }
-					@Override protected Builder self() { return this; }
-				}
-
-				private StockKospi(Builder builder) {
-					super(builder);
-				}
-			}
-			```
-
-
-			```java
-			StockKospi kospi_my = new StockKospi.Builder()
-				.addItem(new StockItem.Builder("035420", "NAVER").sector("서비스업").ipoyear(2008).build())
-				.addItem(new StockItem.Builder("035720", "카카오").build())
-				.addItem(new StockItem.Builder("005930", "삼성전자").build())
-				.build();
-			```
+		```java
+		StockKospi kospi_my = new StockKospi.Builder()
+			.addItem(new StockItem.Builder("035420", "NAVER").sector("서비스업").ipoyear(2008).build())
+			.addItem(new StockItem.Builder("035720", "카카오").build())
+			.addItem(new StockItem.Builder("005930", "삼성전자").build())
+			.build();
+		```
 -----------------------------------------------------------------
 
 ## ITEM-03. [Constructor] Singleton
+`singleton` : 인스턴스를 오직 하나만 생성할 수 있는 클래스
+### public static final 필드 방식
+```java
+	public class Elvis {
+		public static final Elvis INSTANCE = new Elvis();
+		private Elvis() { ... }
+	}
+```
+* 클래스가 싱글턴임이 API에서 명백히 드러남
+* `final`이므로 다른 객체 참조 불가
+* **간결함**
+
+### static factory 방식
+```java
+	public class Elvis {
+		private static final Elvis INSTANCE = new Elvis();
+		private Elvis() { ... }
+		public static Elvis getInstance() { return INSTANCE; }
+	}
+```
+* 정적팩터리를 제네릭 싱글턴 팩터리로 확장 가능
+* 정적팩터리의 '메서드 참조'를 Supplier로 사용 가능
+* ___위 두가지 장점이 불필요하면, `public static final` 방식이 더 좋음___
+
+### Reflection 방어
+```java
+	public class Elvis {
+		public static final Elvis INSTANCE = new Elvis();
+		private Elvis() {
+			if (INSTANCE != null) throw new RuntimeException("생성자 생성불가!!");
+			//...
+		}
+	}
+```
+
+### Singleton Class 직렬화
+```java
+	public class Elvis implements Serializable {
+		private static final Elvis INSTANCE = new Elvis();
+		private Elvis() { ... }
+		public static Elvis getInstance() { return INSTANCE; }
+
+		private Object readResolve() { // singleton임을 보장
+			return INSTANCE; // 진짜 INSTANCE 반환하고, 가짜는 GC로 보냄
+		}
+	}
+```
+* 역직렬화 시, 새로운 인스턴스 생성을 방지하기 위해 readResolve() 를 제공해야함
+
+### Enum 방식
+```java
+	public enum Elvis {
+		INSTANCE;
+		public void leaveTheBuilding() { ... }
+	}
+```
+* 가장 간결함
+* 추가 코드없이 직렬화 가능
+* ___Reflection 공격과 복잡한 직렬화 상황에도 싱글턴 방어 유지___
