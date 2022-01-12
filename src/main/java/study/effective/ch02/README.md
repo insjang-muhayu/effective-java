@@ -1,9 +1,9 @@
 # 2장. 객체 생성과 파괴
 
-- [x] ITEM-01. [Static Factory Method](#item-01)
-- [x] ITEM-02. [Builder](#item-02)
-- [x] ITEM-03. [Singleton](#item-03)
-- [x] ITEM-04. [Private Constructor](#item-04)
+- [x] ITEM-01. [Static Factory Method](#item-01.-static-factory-method)
+- [x] ITEM-02. [Builder](#item-02.-builder)
+- [x] ITEM-03. [Singleton](#item-03.-singleton)
+- [x] ITEM-04. [Private Constructor](#item\-04.-private-constructor)
 - [x] ITEM-05. [Dependency Injection](#item-05)
 - [ ] ITEM-06. [Avoid Unnecessary Object](#item-06)
 - [ ] ITEM-07. [Eliminate Object Reference](#item-07)
@@ -11,7 +11,6 @@
 - [ ] ITEM-09. [try-with-resources](#item-09)
 
 ---------------------------------------------------------------
-#item-01
 ## ITEM-01. Static Factory Method
 ### Static Factory Method 특징
 1. __객체의 특성에 적합한 작명 가능__
@@ -53,7 +52,7 @@
 	> `List<Complaint> litany = Collectins.list(legacyLitany);`
 
 -----------------------------------------------------------------
-#item-02
+# item 02
 
 ## ITEM-02. Builder
 ### 점층적 생성자 패턴 (Telescoping Constructor Pattern)
@@ -197,7 +196,6 @@
 		```
 
 -----------------------------------------------------------------
-#item-03
 
 ## ITEM-03. Singleton
 `singleton` : 인스턴스를 오직 하나만 생성할 수 있는 클래스
