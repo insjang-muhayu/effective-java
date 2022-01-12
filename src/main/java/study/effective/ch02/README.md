@@ -1,11 +1,11 @@
 # 2장. 객체 생성과 파괴
 
-- [x] item 01. [Static Factory Method](#item-01.-static-factory-method)
-- [x] item 02. [Builder](#item-02.-builder)
-- [x] item 03. [Singleton](#item-03.-singleton)
-- [x] item 04. [Private Constructor](#item-04.-private-constructor)
-- [x] item 05. [Dependency Injection](#item-05.-dependency-injection)
-- [ ] item 06. [Avoid Unnecessary Object](#item-06)
+- [x] item 01. [Static Factory Method](#item-01-static-factory-method)
+- [x] item 02. [Builder](#item-02-builder)
+- [x] item 03. [Singleton](#item-03-singleton)
+- [x] item 04. [Private Constructor](#item-04-private-constructor)
+- [x] item 05. [Dependency Injection](#item-05-dependency-injection)
+- [ ] item 06. [Avoid Unnecessary Object](#item-06-avoid-unnecessary-object)
 - [ ] item 07. [Eliminate Object Reference](#item-07)
 - [ ] item 08. [Avoid finalizer and cleaner](#item-08)
 - [ ] item 09. [try-with-resources](#item-09)
