@@ -1,18 +1,18 @@
 # 2장. 객체 생성과 파괴
 
-- [x] ITEM-01. [Constructor] **Static Factory Method**
-- [x] ITEM-02. [Constructor] **Builder**
-- [x] ITEM-03. [Constructor] **Singleton**
-- [ ] ITEM-04. [Constructor] **Private Constructor**
-- [ ] ITEM-05. [Constructor] **Dependency Injection**
-- [ ] ITEM-06. [Constructor] **Avoid Unnecessary Object**
-- [ ] ITEM-07. [Constructor] **Eliminate Object Reference**
-- [ ] ITEM-08. [Constructor] **Avoid finalizer and cleaner**
-- [ ] ITEM-09. [Constructor] **try-with-resources**
+- [x] ITEM-01. [Static Factory Method](#item-01)
+- [x] ITEM-02. [Builder](#item-02)
+- [x] ITEM-03. [Singleton](#item-03)
+- [x] ITEM-04. [Private Constructor](#item-04)
+- [x] ITEM-05. [Dependency Injection](#item-05)
+- [ ] ITEM-06. [Avoid Unnecessary Object](#item-06)
+- [ ] ITEM-07. [Eliminate Object Reference](#item-07)
+- [ ] ITEM-08. [Avoid finalizer and cleaner](#item-08)
+- [ ] ITEM-09. [try-with-resources](#item-09)
 
-
------------------------------------------------------------------
-## ITEM-01. [생성자] Static Factory Method
+---------------------------------------------------------------
+#item-01
+## ITEM-01. Static Factory Method
 ### Static Factory Method 특징
 1. __객체의 특성에 적합한 작명 가능__
 	* `BigInteger(int, int, Random)` -> `BigInteger.probablePrime`
@@ -53,7 +53,9 @@
 	> `List<Complaint> litany = Collectins.list(legacyLitany);`
 
 -----------------------------------------------------------------
-## ITEM-02. [Constructor] Builder
+#item-02
+
+## ITEM-02. Builder
 ### 점층적 생성자 패턴 (Telescoping Constructor Pattern)
 * 매개변수의 개수/타입로 생성자를 구분하는 방식
 * 생성자에 필요한 매개변수가 단순할 때 사용 (가장 기초적 생성자 패턴)
@@ -193,11 +195,13 @@
 			.addItem(new StockItem.Builder("005930", "삼성전자").build())
 			.build();
 		```
------------------------------------------------------------------
 
-## ITEM-03. [Constructor] Singleton
+-----------------------------------------------------------------
+#item-03
+
+## ITEM-03. Singleton
 `singleton` : 인스턴스를 오직 하나만 생성할 수 있는 클래스
-### public static final 필드 방식
+### [ Public Static Final 필드 방식 ]
 ```java
 	public class Elvis {
 		public static final Elvis INSTANCE = new Elvis();
@@ -206,9 +210,9 @@
 ```
 * 클래스가 싱글턴임이 API에서 명백히 드러남
 * `final`이므로 다른 객체 참조 불가
-* **간결함**
+* **간결함.. !!**
 
-### static factory 방식
+### [ Static Factory 방식 ]
 ```java
 	public class Elvis {
 		private static final Elvis INSTANCE = new Elvis();
@@ -220,7 +224,7 @@
 * 정적팩터리의 '메서드 참조'를 Supplier로 사용 가능
 * ___위 두가지 장점이 불필요하면, `public static final` 방식이 더 좋음___
 
-### Reflection 방어
+### [ Reflection 방어 ]
 ```java
 	public class Elvis {
 		public static final Elvis INSTANCE = new Elvis();
@@ -231,7 +235,7 @@
 	}
 ```
 
-### Singleton Class 직렬화
+### [ Singleton Class 직렬화 ] : implements Serializable
 ```java
 	public class Elvis implements Serializable {
 		private static final Elvis INSTANCE = new Elvis();
@@ -245,13 +249,85 @@
 ```
 * 역직렬화 시, 새로운 인스턴스 생성을 방지하기 위해 readResolve() 를 제공해야함
 
-### Enum 방식
+### [ Enum 방식 ] : 싱글턴 끝판왕!!
 ```java
 	public enum Elvis {
 		INSTANCE;
+
 		public void leaveTheBuilding() { ... }
 	}
 ```
 * 가장 간결함
 * 추가 코드없이 직렬화 가능
 * ___Reflection 공격과 복잡한 직렬화 상황에도 싱글턴 방어 유지___
+
+
+-----------------------------------------------------------------
+#item-04
+
+## ITEM-04. Private Constructor
+* `java.util.Arrays` or `java.lang.Math` 처럼 Static Method외 Static Field 를 모아둔 Utitlity Class를 만들 경우,<br>
+   비어있는 `private형 생성자`를 만들어서 인스턴스 화를 방지해야 한다. _(컴파일러에서 자동으로 public 생성자를 생성하기 때문)_
+* `final class`를 상속해서 하위 클래스에 메서드를 넣는 것은 불가능하므로, final 클래스와 관련 메서드들을 모아놓을때도 사용
+
+```java
+	public class StockUtility {
+		// Suppresses default constructor, ensuring non-instantiability.
+		private StockUtility() { throw new AssertionError(); }
+		// ...
+	}
+```
+
+### java.util.Arrays
+```java
+	public class Arrays {
+		private static final int MIN_ARRAY_SORT_GRAN = 1 << 13;
+
+		// Suppresses default constructor, ensuring non-instantiability.
+		private Arrays() {}
+
+		static final class NaturalOrder implements Comparator<Object> { ... }
+		...
+	}
+```
+
+-----------------------------------------------------------------
+#item-05
+
+
+## ITEM-05. [Constructor] Dependency Injection
+* 여러 자원에 의존적인 클래스의 경우는 `Static Utility Class` or `Singleton` 방식은 부적합
+* `의존 객체 주입(Dependency Injection)` 패턴은 인스턴스 생성 시, 필요한 자원을 넘겨주는 방식
+* __유연성, 재사용성, 테스트 용이성__ 높여줌
+* 단점 : 의존성이 너무 많은 프로젝트에서는 코드가 어지럽다. (Spring FW를 사용해 해결할 것)
+
+```java
+	public class SpellChecker {
+		private final Lexicon dictionary; // 주입된 자원을 final로 불변 보장
+
+		public SpellChecker(Lexicon dictionary) { // 의존 객체 주입 !!
+			// null이면 NullPointerException, 아닌경우 objects 반환
+			this.dictionary = Objects.requireNonNull(dictionary);
+		}
+
+		public boolean isValid(String word){}
+	}
+```
+
+### Factory : Supplier\<T\> 인터페이스
+
+```java
+	@FunctionalInterface
+	public interface Supplier<T> {
+		T get();
+	}
+```
+```java
+	Mosaic create(Supplier<? extends Tile> tileFactory) { ... }
+```
+
+-----------------------------------------------------------------
+
+
+## ITEM-06. [Constructor] Avoid Unnecessary Object
+
