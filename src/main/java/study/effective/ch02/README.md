@@ -1,17 +1,17 @@
 # 2장. 객체 생성과 파괴
 
-- [x] ITEM-01. [Static Factory Method](#item-01.-static-factory-method)
-- [x] ITEM-02. [Builder](#item-02.-builder)
-- [x] ITEM-03. [Singleton](#item-03.-singleton)
-- [x] ITEM-04. [Private Constructor](#item\-04.-private-constructor)
-- [x] ITEM-05. [Dependency Injection](#item-05)
-- [ ] ITEM-06. [Avoid Unnecessary Object](#item-06)
-- [ ] ITEM-07. [Eliminate Object Reference](#item-07)
-- [ ] ITEM-08. [Avoid finalizer and cleaner](#item-08)
-- [ ] ITEM-09. [try-with-resources](#item-09)
+- [x] item 01. [Static Factory Method](#item-01.-static-factory-method)
+- [x] item 02. [Builder](#item-02.-builder)
+- [x] item 03. [Singleton](#item-03.-singleton)
+- [x] item 04. [Private Constructor](#item-04.-private-constructor)
+- [x] item 05. [Dependency Injection](#item-05.-dependency-injection)
+- [ ] item 06. [Avoid Unnecessary Object](#item-06)
+- [ ] item 07. [Eliminate Object Reference](#item-07)
+- [ ] item 08. [Avoid finalizer and cleaner](#item-08)
+- [ ] item 09. [try-with-resources](#item-09)
 
 ---------------------------------------------------------------
-## ITEM-01. Static Factory Method
+## item 01. Static Factory Method
 ### Static Factory Method 특징
 1. __객체의 특성에 적합한 작명 가능__
 	* `BigInteger(int, int, Random)` -> `BigInteger.probablePrime`
@@ -52,9 +52,8 @@
 	> `List<Complaint> litany = Collectins.list(legacyLitany);`
 
 -----------------------------------------------------------------
-# item 02
 
-## ITEM-02. Builder
+## item 02. Builder
 ### 점층적 생성자 패턴 (Telescoping Constructor Pattern)
 * 매개변수의 개수/타입로 생성자를 구분하는 방식
 * 생성자에 필요한 매개변수가 단순할 때 사용 (가장 기초적 생성자 패턴)
@@ -197,7 +196,7 @@
 
 -----------------------------------------------------------------
 
-## ITEM-03. Singleton
+## item 03. Singleton
 `singleton` : 인스턴스를 오직 하나만 생성할 수 있는 클래스
 ### [ Public Static Final 필드 방식 ]
 ```java
@@ -261,9 +260,8 @@
 
 
 -----------------------------------------------------------------
-#item-04
 
-## ITEM-04. Private Constructor
+## item 04. Private Constructor
 * `java.util.Arrays` or `java.lang.Math` 처럼 Static Method외 Static Field 를 모아둔 Utitlity Class를 만들 경우,<br>
    비어있는 `private형 생성자`를 만들어서 인스턴스 화를 방지해야 한다. _(컴파일러에서 자동으로 public 생성자를 생성하기 때문)_
 * `final class`를 상속해서 하위 클래스에 메서드를 넣는 것은 불가능하므로, final 클래스와 관련 메서드들을 모아놓을때도 사용
@@ -290,10 +288,9 @@
 ```
 
 -----------------------------------------------------------------
-#item-05
 
 
-## ITEM-05. [Constructor] Dependency Injection
+## item 05. Dependency Injection
 * 여러 자원에 의존적인 클래스의 경우는 `Static Utility Class` or `Singleton` 방식은 부적합
 * `의존 객체 주입(Dependency Injection)` 패턴은 인스턴스 생성 시, 필요한 자원을 넘겨주는 방식
 * __유연성, 재사용성, 테스트 용이성__ 높여줌
@@ -327,5 +324,5 @@
 -----------------------------------------------------------------
 
 
-## ITEM-06. [Constructor] Avoid Unnecessary Object
+## item 06. Avoid Unnecessary Object
 
