@@ -7,10 +7,10 @@
 - [x] item 03. [Singleton](#item-03-singleton)
 - [x] item 04. [Private Constructor](#item-04-private-constructor)
 - [x] item 05. [Dependency Injection](#item-05-dependency-injection)
-- [ ] item 06. [Avoid Unnecessary Object](#item-06-avoid-unnecessary-object)
-- [ ] item 07. [Eliminate Object Reference](#item-07)
-- [ ] item 08. [Avoid finalizer and cleaner](#item-08)
-- [ ] item 09. [try-with-resources](#item-09)
+- [x] item 06. [Avoid Unnecessary Object](#item-06-avoid-unnecessary-object)
+- [ ] item 07. [Eliminate Object Reference](#item-07-eliminate-object-reference)
+- [ ] item 08. [Avoid finalizer and cleaner](#item-08-avoid-finalizer-and-cleaner)
+- [ ] item 09. [try-with-resources](#item-09-try-with-resources)
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
