@@ -332,4 +332,58 @@
 [[TOC]](#목차)
 
 ## item 06. Avoid Unnecessary Object
+### 불필요한 객체 생성을 피해 __성능 개선__
+```java
+	// 나쁜 예 - 호출마다 인스턴스 새로 생성
+	String bad = new String("반복문 안이면 폭망");
+
+	// 좋은 예 - 하나의 인스턴스 재사용
+	String good = "인스턴스 재사용";
+```
+* 동일 기능의 객체를 매번 생성보다 __하나의 객체를 재사용하는 편이 좋다.__
+* [불변객체(item 17)](../ch04/README.md)는 항상 재사용 가능
+* 반복문 안에서는 중요한 이슈가 될 수 있음
+
+### 캐싱하여 재사용
+```java
+	public class RomanNumerals {
+		// 1.불변인 `Pattern` 인스턴스를 클래스 초기화 과정에서 생성 후 캐싱
+		private static final Pattern ROMAN = Pattern.compile("^(?=.)M*(C[MD]|D?C{0,3})" + "(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$");
+
+		static boolean isRomanNumeral(String s) {
+			return ROMAN.matcher(s).matches(); // 2. ROMAN 재사용
+		}
+	}
+```
+
+### 주의! Auto Boxing(자동 형변환)
+```java
+	private static long sum() {
+		Long sum = 0L; // Long 보다 long을 사용하라
+
+		for (long i = 0; i < Integer.MAX_VALUE; i++) {
+			// long i 보다 int i 사용하라
+			sum += i;
+		}
+
+		return sum;
+	}
+```
+
+-----------------------------------------------------------------
+[[TOC]](#목차)
+
+## item 07. Eliminate Object Reference
+
+
+-----------------------------------------------------------------
+[[TOC]](#목차)
+
+## item 08. Avoid finalizer and cleaner
+
+
+-----------------------------------------------------------------
+[[TOC]](#목차)
+
+## item 09. try-with-resources
 
