@@ -1,5 +1,7 @@
 # 2장. 객체 생성과 파괴
 
+## 목차
+
 - [x] item 01. [Static Factory Method](#item-01-static-factory-method)
 - [x] item 02. [Builder](#item-02-builder)
 - [x] item 03. [Singleton](#item-03-singleton)
@@ -11,6 +13,8 @@
 - [ ] item 09. [try-with-resources](#item-09)
 
 ---------------------------------------------------------------
+[[TOC]](#목차)
+
 ## item 01. Static Factory Method
 ### Static Factory Method 특징
 1. __객체의 특성에 적합한 작명 가능__
@@ -52,6 +56,7 @@
 	> `List<Complaint> litany = Collectins.list(legacyLitany);`
 
 -----------------------------------------------------------------
+[[TOC]](#목차)
 
 ## item 02. Builder
 ### 점층적 생성자 패턴 (Telescoping Constructor Pattern)
@@ -195,6 +200,7 @@
 		```
 
 -----------------------------------------------------------------
+[[TOC]](#목차)
 
 ## item 03. Singleton
 `singleton` : 인스턴스를 오직 하나만 생성할 수 있는 클래스
@@ -260,6 +266,7 @@
 
 
 -----------------------------------------------------------------
+[[TOC]](#목차)
 
 ## item 04. Private Constructor
 * `java.util.Arrays` or `java.lang.Math` 처럼 Static Method외 Static Field 를 모아둔 Utitlity Class를 만들 경우,<br>
@@ -288,7 +295,7 @@
 ```
 
 -----------------------------------------------------------------
-
+[[TOC]](#목차)
 
 ## item 05. Dependency Injection
 * 여러 자원에 의존적인 클래스의 경우는 `Static Utility Class` or `Singleton` 방식은 부적합
@@ -322,7 +329,7 @@
 ```
 
 -----------------------------------------------------------------
-
+[[TOC]](#목차)
 
 ## item 06. Avoid Unnecessary Object
 
