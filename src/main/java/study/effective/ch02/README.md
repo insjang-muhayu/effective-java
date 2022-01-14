@@ -374,8 +374,90 @@
 [[TOC]](#목차)
 
 ## item 07. Eliminate Object Reference
+다 쓴 참조(obsolete reference) 객체는 NULL 처리하라.
+* __Stack 메모리 누수 다루기__
+	```java
+		public Object pop() {
+			if (size == 0) throw new EmptyStackException();
+			Object result = elements[--size];
+			elements[size] = null; // 다 쓴 참조 해제
+			return result;
+		}
+	```
+	* 객체참조를 null 처리하는 일은 예외적인 경우에만 사용할 것
+	* 비활성 영역이 되는 순간, null 처리를 통해 다쓴객체란 것을 GC에 알림
+	* Collection 클래스의 원소가 참조한 객체들에 대해 모두 null 처리 해줘야 함
 
+* __Cache 메모리 누수 다루기__
+	* 캐시 외부에서 키를 참조하는 동안만 엔트리가 필요한 상황이라면 `WeakHashMap` 을 사용해서 캐시를 생성
+	* 백그라운드 스레드(`ScheduledThreadPoolExecutor`)를 활용
+	* 캐시에 새 엔트리 추가할 때 부수 작업으로 수행하는 방법
+		```java
+		// LinkedHashMap 사용한 캐시에서 사용하지 않는 엔트리를 처리 방법
+		void afterNodeInsertion(boolean evict) { // 가장 오래된 것을 제거
+			LinkedHashMap.Entry<K,V> first;
+			if (evict && (first = head) != null && removeEldestEntry(first)) {
+				K key = first.key;
+				removeNode(hash(key), key, null, false, true);
+			}
+		}
+		```
 
+* __Listener or Callback 메모리 누수 다루기__
+	* Client가 콜백 등록 후에 미해지한 경우, 콜백을 약한 참조(`weak reference`) 로 저장하면 GC가 즉시 수거함 (ex. `WeakHashMap` 의 키로 저장하는 방법)
+
+```java
+	// 출처 : https://dahye-jeong.gitbook.io/java/java/effective_java/2021-01-22-eliminate-object-reference
+	public class ReferenceTest {
+		public static void main(String[] args){
+			Integer key1 = 1000; Integer key2 = 2000; Integer key3 = 3000;
+
+			HashMap<Integer, String> hashMap = new HashMap<>();
+			hashMap.put(key3, "test c");
+			hashMap.put(key2, "test b");
+			key3 = null;
+
+			System.out.println("HashMap GC 수행 이전");
+			hashMap.entrySet().stream().forEach(el -> System.out.println(el));
+
+			System.gc(); // GC 수행
+
+			System.out.println("HashMap GC 수행 이후");
+			hashMap.entrySet().stream().forEach(el -> System.out.println(el));
+
+			//-------------------------------------------------
+
+			WeakHashMap<Integer, String> weakMap = new WeakHashMap<>();
+			weakMap.put(key1, "test a");
+			weakMap.put(key2, "test b");
+			key1 = null;
+
+			System.out.println("WeakHashMap GC 수행 이전");
+			weakMap.entrySet().stream().forEach(el -> System.out.println(el));
+
+			System.gc(); // GC 수행
+
+			System.out.println("WeakHashMap GC 수행 이후");
+			weakMap.entrySet().stream().forEach(el -> System.out.println(el));
+		}
+	}
+
+/*
+output :
+	HashMap GC 수행 이전
+	2000=test b
+	3000=test c // <-- key c = null
+	HashMap GC 수행 이후
+	2000=test b
+	3000=test c // <-- 그대로 남아있음
+
+	WeakHashMap GC 수행 이전
+	1000=test a // <-- key a = null
+	2000=test b
+	WeakHashMap GC 수행 이후
+	2000=test b
+*/
+```
 -----------------------------------------------------------------
 [[TOC]](#목차)
 
