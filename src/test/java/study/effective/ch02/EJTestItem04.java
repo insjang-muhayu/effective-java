@@ -18,8 +18,12 @@ public class EJTestItem04 {
 	}
 
 	public static void main(String[] args) {
+
+		// StockUtils s = new StockUtils(); // <-- 유틸리티 인스턴스화 불가능하게
+
 		String url = "https://m.nocafe.com/";
 		String html = StockUtils.getHtml(url);
+
 		System.out.println("[\n"+html+"\n]");
 	}
 }
