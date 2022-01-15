@@ -2,11 +2,11 @@
 
 ## 목차
 
-- [x] item 10. [Overriding equlas](#item-01-static-factory-method)
-- [x] item 11. [Overriding hashCode](#item-02-builder)
-- [x] item 12. [Overriding toString](#item-03-singleton)
-- [x] item 13. [Overriding clone judiciously](#item-04-private-constructor)
-- [x] item 14. [Consider implementing comparable](#item-05-dependency-injection)
+- [x] item 10. [Overriding equlas](#item-10-overriding-equlas)
+- [x] item 11. [Overriding hashCode](#item-11-overriding-hashcode)
+- [x] item 12. [Overriding toString](#item-12-overriding-tostring)
+- [x] item 13. [Overriding clone judiciously](#item-13-overriding-clone-judiciously)
+- [x] item 14. [Consider implementing comparable](#item-14-consider-implementing-comparable)
 
 
 ---------------------------------------------------------------
