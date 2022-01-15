@@ -272,15 +272,15 @@
 [[TOC]](#목차)
 
 ## item 04. Private Constructor
-`[객체생성]`
+`[객체생성]` : ( [StockUtils.java : StockUtils()](./StockUtils.java) )
 * `java.util.Arrays` or `java.lang.Math` 처럼 Static Method외 Static Field 를 모아둔 Utitlity Class를 만들 경우,<br>
    비어있는 `private형 생성자`를 만들어서 인스턴스 화를 방지해야 한다. _(컴파일러에서 자동으로 public 생성자를 생성하기 때문)_
 * `final class`를 상속해서 하위 클래스에 메서드를 넣는 것은 불가능하므로, final 클래스와 관련 메서드들을 모아놓을때도 사용
 
 ```java
-	public class StockUtility {
+	public class StockUtils {
 		// Suppresses default constructor, ensuring non-instantiability.
-		private StockUtility() { throw new AssertionError(); }
+		private StockUtils() { throw new AssertionError(); }
 		// ...
 	}
 ```
@@ -411,7 +411,8 @@
 		```
 
 * __Listener or Callback 메모리 누수 다루기__
-	* Client가 콜백 등록 후에 미해지한 경우, 콜백을 약한 참조(`weak reference`) 로 저장하면 GC가 즉시 수거함 (ex. `WeakHashMap` 의 키로 저장하는 방법)
+	* Client가 콜백 등록 후에 미해지한 경우, 콜백을 약한 참조(`weak reference`) 로 저장하면 GC가 즉시 수거함
+		> (ex. `WeakHashMap` 의 키로 저장하는 방법)
 
 ( [EJTestItem07.java](/insjang-muhayu/effective-java/blob/main/src/test/java/study/effective/ch02/EJTestItem07.java) )
 ```java
@@ -475,4 +476,34 @@ output :
 [[TOC]](#목차)
 
 ## item 09. try-with-resources
+`[객체소멸]` : ( [StockUtils.java : getHtml(url)](./StockUtils.java) )
+### try - with -resources
+```java
+	try (SomeResource resource = getResource()) {
+		use(resource);
+	} catch (...) {
+		...
+	}
+```
+try에 복수 자원 객체 전달
+```java
+try (Something1 s1 = new Something1(); Something2 s2 = new Something2()) {
 
+} catch (...) {
+    ...
+}
+```
+`try-with-resources` 구조를 사용할려면 __`AutoCloseable` 인터페이스를 구현해야 함__
+```java
+public interface AutoCloseable {
+    void close() throws Exception;
+}
+```
+
+
+-----------------------------------------------------------------
+[[TOC]](#목차)
+
+... 2장 끝 ...
+
+[다음 3장 >>>](../ch03/README.md)
