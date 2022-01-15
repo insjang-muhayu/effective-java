@@ -8,14 +8,15 @@
 - [x] item 04. [Private Constructor](#item-04-private-constructor)
 - [x] item 05. [Dependency Injection](#item-05-dependency-injection)
 - [x] item 06. [Avoid Unnecessary Object](#item-06-avoid-unnecessary-object)
-- [ ] item 07. [Eliminate Object Reference](#item-07-eliminate-object-reference)
-- [ ] item 08. [Avoid finalizer and cleaner](#item-08-avoid-finalizer-and-cleaner)
-- [ ] item 09. [try-with-resources](#item-09-try-with-resources)
+- [x] item 07. [Eliminate Object Reference](#item-07-eliminate-object-reference)
+- [x] item 08. [Avoid finalizer and cleaner](#item-08-avoid-finalizer-and-cleaner)
+- [x] item 09. [try-with-resources](#item-09-try-with-resources)
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
 ## item 01. Static Factory Method
+`[객체생성]`
 ### Static Factory Method 특징
 1. __객체의 특성에 적합한 작명 가능__
 	* `BigInteger(int, int, Random)` -> `BigInteger.probablePrime`
@@ -59,6 +60,7 @@
 [[TOC]](#목차)
 
 ## item 02. Builder
+`[객체생성]`
 ### 점층적 생성자 패턴 (Telescoping Constructor Pattern)
 * 매개변수의 개수/타입로 생성자를 구분하는 방식
 * 생성자에 필요한 매개변수가 단순할 때 사용 (가장 기초적 생성자 패턴)
@@ -203,6 +205,7 @@
 [[TOC]](#목차)
 
 ## item 03. Singleton
+`[객체생성]`
 `singleton` : 인스턴스를 오직 하나만 생성할 수 있는 클래스
 ### [ Public Static Final 필드 방식 ]
 ```java
@@ -269,6 +272,7 @@
 [[TOC]](#목차)
 
 ## item 04. Private Constructor
+`[객체생성]`
 * `java.util.Arrays` or `java.lang.Math` 처럼 Static Method외 Static Field 를 모아둔 Utitlity Class를 만들 경우,<br>
    비어있는 `private형 생성자`를 만들어서 인스턴스 화를 방지해야 한다. _(컴파일러에서 자동으로 public 생성자를 생성하기 때문)_
 * `final class`를 상속해서 하위 클래스에 메서드를 넣는 것은 불가능하므로, final 클래스와 관련 메서드들을 모아놓을때도 사용
@@ -298,6 +302,8 @@
 [[TOC]](#목차)
 
 ## item 05. Dependency Injection
+`[객체생성]`
+
 * 여러 자원에 의존적인 클래스의 경우는 `Static Utility Class` or `Singleton` 방식은 부적합
 * `의존 객체 주입(Dependency Injection)` 패턴은 인스턴스 생성 시, 필요한 자원을 넘겨주는 방식
 * __유연성, 재사용성, 테스트 용이성__ 높여줌
@@ -332,6 +338,7 @@
 [[TOC]](#목차)
 
 ## item 06. Avoid Unnecessary Object
+`[객체생성]`
 ### 불필요한 객체 생성을 피해 __성능 개선__
 ```java
 	// 나쁜 예 - 호출마다 인스턴스 새로 생성
@@ -374,7 +381,7 @@
 [[TOC]](#목차)
 
 ## item 07. Eliminate Object Reference
-다 쓴 참조(obsolete reference) 객체는 NULL 처리하라.
+`[객체소멸]` 다 쓴 참조(obsolete reference) 객체는 NULL 처리하라.
 * __Stack 메모리 누수 다루기__
 	```java
 		public Object pop() {
@@ -406,31 +413,18 @@
 * __Listener or Callback 메모리 누수 다루기__
 	* Client가 콜백 등록 후에 미해지한 경우, 콜백을 약한 참조(`weak reference`) 로 저장하면 GC가 즉시 수거함 (ex. `WeakHashMap` 의 키로 저장하는 방법)
 
+( [EJTestItem07.java](/insjang-muhayu/effective-java/blob/main/src/test/java/study/effective/ch02/EJTestItem07.java) )
 ```java
 	// 출처 : https://dahye-jeong.gitbook.io/java/java/effective_java/2021-01-22-eliminate-object-reference
 	public class ReferenceTest {
 		public static void main(String[] args){
 			Integer key1 = 1000; Integer key2 = 2000; Integer key3 = 3000;
 
-			HashMap<Integer, String> hashMap = new HashMap<>();
-			hashMap.put(key3, "test c");
-			hashMap.put(key2, "test b");
-			key3 = null;
-
-			System.out.println("HashMap GC 수행 이전");
-			hashMap.entrySet().stream().forEach(el -> System.out.println(el));
-
-			System.gc(); // GC 수행
-
-			System.out.println("HashMap GC 수행 이후");
-			hashMap.entrySet().stream().forEach(el -> System.out.println(el));
-
-			//-------------------------------------------------
-
 			WeakHashMap<Integer, String> weakMap = new WeakHashMap<>();
 			weakMap.put(key1, "test a");
 			weakMap.put(key2, "test b");
-			key1 = null;
+
+			key1 = null; // HashMap에서는 GC 수행 시 바로 처리 안됨
 
 			System.out.println("WeakHashMap GC 수행 이전");
 			weakMap.entrySet().stream().forEach(el -> System.out.println(el));
@@ -444,13 +438,6 @@
 
 /*
 output :
-	HashMap GC 수행 이전
-	2000=test b
-	3000=test c // <-- key c = null
-	HashMap GC 수행 이후
-	2000=test b
-	3000=test c // <-- 그대로 남아있음
-
 	WeakHashMap GC 수행 이전
 	1000=test a // <-- key a = null
 	2000=test b
@@ -462,8 +449,28 @@ output :
 [[TOC]](#목차)
 
 ## item 08. Avoid finalizer and cleaner
+`[객체소멸]` `finalizer` & `cleaner`는 피하라
+### 객체 소멸자 : (`finalizer`, `cleaner`)
+* `finalizer`
+	* 예측 불가능, 위험 가능성으로 일반적 불필요
+	* 오동작, 낮은 성능, 이식성 문제의 원인
+	* JAVA 9 부터 `deprecated` 됨
+* `cleaner`
+	* finalizer의 대안으로 등장 (덜 위험함)
+	* 예측 불가능, 느림, 일반적으로 불필요
 
+### 사용 자제 이유
+1. 실제 소멸 수행 시점을 알 수 없음 (보장이 안됨)
+	> 상태를 영구적으로 수정하는 작업에서는 절대 finalizer or cleaner에 의존하면 안됨
+2. 심각한 성능 문제가 동반될 수 있음
+	> GC의 효율을 상당히 떨어뜨림
+3. `finalizer 공격` 노출로 심각한 보안문제 유발 가능
+	> 방어 방법 : 빈 finalize 메소드 생성 후 final로 선언
 
+### 사용하는 곳
+1. 자원 소유자가 `close()`를 호출하지 않는 것에 대비한 안전망 역할
+	> `FileInputStream`, `FileOutputStream`, `ThreadPoolExecutor` 에서 안전망 역할의 finalizer 제공함
+2. 네이티브 피어(`Native Peer`)와 연결된 객체 자원 회수용으로 사용
 -----------------------------------------------------------------
 [[TOC]](#목차)
 
