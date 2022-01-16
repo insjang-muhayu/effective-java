@@ -18,7 +18,7 @@
 ## item 01. Static Factory Method
 `[객체생성]`
 ### Static Factory Method 특징
-1. __객체의 특성에 적합한 작명 가능__
+1. __객체의 특성에 적합한 명명 가능__
 	* `BigInteger(int, int, Random)` -> `BigInteger.probablePrime`
 2. __인스턴스를 새로 생성하지 않아도 됨__
 	* 인스턴스 캐슁하여 재활용 : 불필요한 객체생성 회피, 반복 호출 시 성능향상 기여

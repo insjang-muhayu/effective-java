@@ -23,7 +23,78 @@
 
 
 ### equals 메서드 규약
+* 반사성 (reflexivity)
+	> null이 아닌 모든 참조값 __X__ 에 대해,  
+	> `X.equals(X)`는 true
+	- 객체는 자기 자신과 같아야 한다는 뜻
+* 대치성 (symmetry)
+	> null이 아닌 모든 참조값 __X, Y__ 에 대해,  
+	> `X.equals(Y)`가 true 이면, `Y.equals(X)`도 true
+	- 두 객체는 서로의 동치여부에 대해 똑같은 결과 반환
 
+* 추이성 (transitivity)
+	> null이 아닌 모든 참조값 __X, Y, Z__ 에 대해,  
+	> `X.equals(Y)`가 true 이고 `Y.equals(Z)`가 true 이면,  
+	> `X.equals(Z)`도 true
+* 일관성 (consistency)
+	> null이 아닌 모든 참조값 __X, Y__ 에 대해,  
+	> `X.equals(Y)`를 반복 호출하면, 항상 같은 true or false를 반환
+* null 아님
+	> null이 아닌 모든 참조값 __X__ 에 대해,  
+	> `X.equals(null)`은 false
+```java
+public class ColorPoint {
+	private final Color color;
+	private final Point point;
+
+	public ColorPoint(int x, int y, Color color) {
+		this.point = new Point(x,y);
+		this.color = Objects.requireNonNull(color);
+	}
+
+	public Point asPoint() { return point; }
+
+	@Override 
+	public boolean equals(Object o) {
+		if (!(o instanseof ColorPoint)) return false;
+		ColorPoint obj = (ColorPoint) o;
+
+		return obj.point.equals(point) && obj.color.equals(color);
+	}
+}
+```
+
+### equals 구현시 주의사항
+1. `==` 연산자를 사용해 입력이 자신참조인지 확인
+2. `instanceof` 연산자로 입력이 올바른 타입인지 확인
+3. 입력을 올바른 타입으로 형변환
+4. 입력 객체와 자기 자신의 대응되는 '핵심' 필드들이 모두 일치하는지 검사
+
+### @AutoValue
+__'AutoValue 프레임워크'__ 를 사용하면 `equals`와 `hashCode`를 작성해줌
+```java
+	// build.gradle :
+	//	implementation("com.google.auto.value:auto-value:1.3")
+
+	import com.google.auto.value.AutoValue;
+
+	@AutoValue
+	public abstract class Product {
+		public abstract String name();
+		public abstract String price();
+
+		@AutoValue.Builder
+		public abstract static class Builder {
+			public abstract Builder name(String name);
+			public abstract Builder price(String price);
+			public abstract Product build();
+		}
+
+		public static Product.Builder builder() {
+			return new AutoValue_Product.Builder();
+		}
+	}
+```
 -----------------------------------------------------------------
 [[TOC]](#목차)
 
