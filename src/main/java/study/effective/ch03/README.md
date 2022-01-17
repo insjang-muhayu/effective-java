@@ -103,7 +103,26 @@ __'AutoValue 프레임워크'__ 를 사용하면 `equals`와 `hashCode`를 작�
 * `equals`를 재정의한 클래스는 `hashCode`도 재정의 해야 함
 * 미정의 시 HashMap, HashSet에서 원소로 사용하면 문제 발생
 
-### hashCode 란
+### Thread Safe 해시코드
+```java
+public final class PhoneNumber {
+	private final short areaCode, prefix, lineNum;
+	// ... 생략 ...
+	
+	private int hashCode;
+
+	@Override public int hashCode() {
+		int result = hashCode;
+		if ( result == 0) {
+			result = Short.hashCode(areaCode);
+			result = 31 * result + Short.hashCode(prefix);
+			result = 31 * result + Short.hashCode(lineNum);
+			hashCode = result;			
+		}
+		return result;
+	}
+}
+```
 
 -----------------------------------------------------------------
 [[TOC]](#목차)
