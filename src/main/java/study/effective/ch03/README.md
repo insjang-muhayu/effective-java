@@ -55,7 +55,7 @@ public class ColorPoint {
 	public Point asPoint() { return point; }
 
 	@Override 
-	public boolean equals(Object o) {
+	public boolean equals(Object o) { // 입력타입은 Object 여야 한다
 		if (!(o instanseof ColorPoint)) return false;
 		ColorPoint obj = (ColorPoint) o;
 
@@ -65,7 +65,7 @@ public class ColorPoint {
 ```
 
 ### equals 구현시 주의사항
-1. `==` 연산자를 사용해 입력이 자신참조인지 확인
+1. `==` 연산자를 사용해 입력이 자신참조인지 확인 (Float, Double은 .compare()로 비교)
 2. `instanceof` 연산자로 입력이 올바른 타입인지 확인
 3. 입력을 올바른 타입으로 형변환
 4. 입력 객체와 자기 자신의 대응되는 '핵심' 필드들이 모두 일치하는지 검사
@@ -99,7 +99,10 @@ __'AutoValue 프레임워크'__ 를 사용하면 `equals`와 `hashCode`를 작�
 [[TOC]](#목차)
 
 ## item 11. Overriding hashCode
-`[재정의]` equals 를 재정의하려거든 hashCode 도 재정의하라
+`[재정의]` equals 를 재정의하려거든 hashCode 도 재정의하라.  
+* `equals`를 재정의한 클래스는 `hashCode`도 재정의 해야 함
+* 미정의 시 HashMap, HashSet에서 원소로 사용하면 문제 발생
+
 ### hashCode 란
 
 -----------------------------------------------------------------
