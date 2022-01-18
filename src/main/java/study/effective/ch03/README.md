@@ -108,13 +108,14 @@ __'AutoValue 프레임워크'__ 를 사용하면 `equals`와 `hashCode`를 작�
 public final class PhoneNumber {
 	private final short areaCode, prefix, lineNum;
 	// ... 생략 ...
-	
+
 	private int hashCode;
 
 	@Override public int hashCode() {
 		int result = hashCode;
 		if ( result == 0) {
 			result = Short.hashCode(areaCode);
+			// 31 * i == (i << 5) - i
 			result = 31 * result + Short.hashCode(prefix);
 			result = 31 * result + Short.hashCode(lineNum);
 			hashCode = result;			
@@ -129,7 +130,8 @@ public final class PhoneNumber {
 
 ## item 12. Overriding toString
 `[재정의]` toString 을 항상 재정의하라
-### [ Public Static Final 필드 방식 ]
+* 사용성과 디버깅에 필요한 정보 전달을 위해 toString()을 재정의
+* 특별하게 인상적인 내용이 없어 skip...
 
 
 -----------------------------------------------------------------
