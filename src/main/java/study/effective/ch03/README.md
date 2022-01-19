@@ -140,8 +140,84 @@ public final class PhoneNumber {
 ## item 13. Overriding clone judiciously
 `[재정의]` clone 재정의는 주의해서 진행하라
 
-cloneable 은 복제해도 되는 클래스임을 명시하는 용도
+### Cloneable 인터페이스
+* Cloneable 은 복제해도 되는 클래스임을 명시하는 용도
+* Cloneable 인터페이스는 Object의 protected 메서드인 clone의 동작방식을 결정
+* `clone()`을 호출하면 그 객체의 필드들을 하나하나 복사한 객체를 반환
+* 구현하지 않은 클래스의 인스턴스에서 호출하면 `CloneNotSupportException`
+* __불변 클래스__ 는 굳이 clone을 제공하지 않는 것이 좋다.
 
+```java
+	public final class PhoneNumber implements Cloneable {
+		private final short areaCode, prefix, lineNum;
+		private int hashCode;
+
+		@Override
+		public PhoneNumber clone() {
+			try {
+				// (형변환)
+				return (PhoneNumber) super.clone();
+			} catch (CloneNotSupportedException e) {
+				throw new AssertionError();
+			}
+		}
+	}
+```
+
+### Deep Copy
+```java
+	public class HashTable implements Cloneable {
+		private Entry[] buckets = new Entry[10];
+
+		private static class Entry {
+			final Object key;
+			Object value;
+			Entry next;
+
+			Entry(Object key, Object value, Entry next){
+				this.key = key; this.value = value; this.next = next;
+			}
+
+			Entry deepCopy(){
+				// 엔트리가 가리키는 연결 리스트를 재귀적으로 복사 (스택오버플로우 발생위험 존재)
+				// return new Entry(key, value, next == null ? null : next.deepCopy());
+
+				// 스택오버플로우 문제를 피하기 위해 반복자를 사용
+				Entry result = new Entry(key,value, next);
+				for (Entry p = result; p.next != null; p = p.next)
+					p.next = new Entry(p.next.key, p.next.value, p.next.next);
+				return result;
+			}
+		}
+
+		@Override
+		public  HashTable clone() {
+			try {
+				HashTable result = (HashTable) super.clone();
+				result.buckets = new Entry[buckets.length];
+				for (int i = 0 ; i < buckets.length; i++) {
+					if (buckets[i] != null) result.buckets[i] = buckets[i].deepCopy();
+				}
+				return result;
+			} catch (CloneNotSupportedException e) {
+				throw new AssertionError();
+			}
+		}
+	}
+```
+
+### 복사생성자 & 복사팩터리 
+```java
+	// 복사 생성자
+	public Yum(Yum yum) { ... };
+
+	// 복사 팩터리
+	public static Yum newInstance(Yum yum) { ... };
+```
+* 생성자를 쓰지 않는 방식의 객체 생성 메커니즘을 사용하지 않는다.
+* 엉성하게 문서화된 규약에 기대지 않고, 정상적인 final 필드 용법과도 충돌하지 않는다.
+* 불필요한 검사 예외를 던지지 않고, 형변환도 필요치 않는다.
+* __해당 클래스가 구현한 인터페이스 타입의 인스턴스를 인수로 받을 수 있다.__
 -----------------------------------------------------------------
 [[TOC]](#목차)
 
