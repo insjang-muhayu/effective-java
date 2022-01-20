@@ -2,17 +2,17 @@
 
 ## 목차
 
-- [x] item 15. [클래스와 멤버의 접근을 최소화해라](ddd)
-- [x] item 16. [public 클래스에서는 접근자 메서드를 사용하라](ddd)
-- [x] item 17. [변경 가능성을 최소화해라](ddd)
-- [x] item 18. [상속보단 컴포지션을 사용해라](ddd)
-- [x] item 19. [상속을 고려해 설계하고 문서화해라](ddd)
-- [x] item 20. [추상 클래스보다 인터페이스를 우선하라](ddd)
-- [x] item 21. [인터페이스는 구현하는 쪽을 생각해 설계해라](ddd)
-- [x] item 22. [인터페이스는 타입을 정의하는 용도로만 사용해라](ddd)
-- [x] item 23. [태그 달린 클래스보다 클래스 계층구조를 활용해라](ddd)
-- [x] item 24. [멤버 클래스는 되도록 static으로 구현해라](ddd)
-- [x] item 25. [톱레벨 클래스는 한 파일에 하나만 생성해라](ddd)
+- [x] item 15. [클래스와 멤버의 접근을 최소화해라](#item-15-%ED%81%B4%EB%9E%98%EC%8A%A4%EC%99%80-%EB%A9%A4%EB%B2%84%EC%9D%98-%EC%A0%91%EA%B7%BC%EC%9D%84-%EC%B5%9C%EC%86%8C%ED%99%94%ED%95%B4%EB%9D%BC)
+- [x] item 16. [public 클래스에서는 접근자 메서드를 사용하라](#item-16-public-%ED%81%B4%EB%9E%98%EC%8A%A4%EC%97%90%EC%84%9C%EB%8A%94-%EC%A0%91%EA%B7%BC%EC%9E%90-%EB%A9%94%EC%84%9C%EB%93%9C%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%98%EB%9D%BC)
+- [x] item 17. [변경 가능성을 최소화해라](#item-17-%EB%B3%80%EA%B2%BD-%EA%B0%80%EB%8A%A5%EC%84%B1%EC%9D%84-%EC%B5%9C%EC%86%8C%ED%99%94%ED%95%B4%EB%9D%BC)
+- [x] item 18. [상속보단 컴포지션을 사용해라](#item-18-%EC%83%81%EC%86%8D%EB%B3%B4%EB%8B%A8-%EC%BB%B4%ED%8F%AC%EC%A7%80%EC%85%98%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%B4%EB%9D%BC)
+- [x] item 19. [상속을 고려해 설계하고 문서화해라](#item-19-%EC%83%81%EC%86%8D%EC%9D%84-%EA%B3%A0%EB%A0%A4%ED%95%B4-%EC%84%A4%EA%B3%84%ED%95%98%EA%B3%A0-%EB%AC%B8%EC%84%9C%ED%99%94%ED%95%B4%EB%9D%BC)
+- [x] item 20. [추상 클래스보다 인터페이스를 우선하라](#item-20-%EC%B6%94%EC%83%81-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%B3%B4%EB%8B%A4-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4%EB%A5%BC-%EC%9A%B0%EC%84%A0%ED%95%98%EB%9D%BC)
+- [x] item 21. [인터페이스는 구현하는 쪽을 생각해 설계해라](#item-21-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4%EB%8A%94-%EA%B5%AC%ED%98%84%ED%95%98%EB%8A%94-%EC%AA%BD%EC%9D%84-%EC%83%9D%EA%B0%81%ED%95%B4-%EC%84%A4%EA%B3%84%ED%95%B4%EB%9D%BC)
+- [x] item 22. [인터페이스는 타입을 정의하는 용도로만 사용해라](#item-22-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4%EB%8A%94-%ED%83%80%EC%9E%85%EC%9D%84-%EC%A0%95%EC%9D%98%ED%95%98%EB%8A%94-%EC%9A%A9%EB%8F%84%EB%A1%9C%EB%A7%8C-%EC%82%AC%EC%9A%A9%ED%95%B4%EB%9D%BC)
+- [x] item 23. [태그 달린 클래스보다 클래스 계층구조를 활용해라](#item-23-%ED%83%9C%EA%B7%B8-%EB%8B%AC%EB%A6%B0-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%B3%B4%EB%8B%A4-%ED%81%B4%EB%9E%98%EC%8A%A4-%EA%B3%84%EC%B8%B5%EA%B5%AC%EC%A1%B0%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%B4%EB%9D%BC)
+- [x] item 24. [멤버 클래스는 되도록 static으로 구현해라](#item-24-%EB%A9%A4%EB%B2%84-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%8A%94-%EB%90%98%EB%8F%84%EB%A1%9D-static%EC%9C%BC%EB%A1%9C-%EA%B5%AC%ED%98%84%ED%95%B4%EB%9D%BC)
+- [x] item 25. [톱레벨 클래스는 한 파일에 하나만 생성해라](#item-25-%ED%86%B1%EB%A0%88%EB%B2%A8-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%8A%94-%ED%95%9C-%ED%8C%8C%EC%9D%BC%EC%97%90-%ED%95%98%EB%82%98%EB%A7%8C-%EC%83%9D%EC%84%B1%ED%95%B4%EB%9D%BC)
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
