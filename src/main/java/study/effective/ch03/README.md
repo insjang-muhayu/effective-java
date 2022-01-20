@@ -141,8 +141,13 @@ public final class PhoneNumber {
 `[재정의]` clone 재정의는 주의해서 진행하라
 
 ### Cloneable 인터페이스
+```java
+public interface Cloneable {
+	// 메서드가 하나도 없음
+}
+```
 * Cloneable 은 복제해도 되는 클래스임을 명시하는 용도
-* Cloneable 인터페이스는 Object의 protected 메서드인 clone의 동작방식을 결정
+* Cloneable 인터페이스는 Object의 protected 메서드인 __clone()의 동작방식을 결정__
 * `clone()`을 호출하면 그 객체의 필드들을 하나하나 복사한 객체를 반환
 * 구현하지 않은 클래스의 인스턴스에서 호출하면 `CloneNotSupportException`
 * __불변 클래스__ 는 굳이 clone을 제공하지 않는 것이 좋다.
@@ -221,12 +226,42 @@ public final class PhoneNumber {
 -----------------------------------------------------------------
 [[TOC]](#목차)
 
-## item 14. Consider implementing comparable
+## item 14. Consider implementing Comparable
 `[비교]` Comparable 을 구현할지 고민하라
+```java
+	public interface Comparable<T> {
+		//	자신과 주어진 객체의 순서를 비교
+		//	비교 불가 타입의 객체는 ClassCastException 반환
+		public int compareTo(T o);
+	}
+```
+알파벳, 숫자, 연대 같이 순서가 명확한 값 클래스를 작성한다면 반드시 `Comparable 인터페이스`를 구현하자.
 
-알파벳, 숫자, 연대 같이 순서가 명확한 값 클래스를 작성한다면 반드시 Comparable 인터페이스를 구현하자.
+* `Comparable`은 단순 동치비교와 순서비교를 할 수 있는 Generic 인터페이스
+* `Comparable`을 구현한 클래스의 인스턴스에는 자연적인 순서가 있음
+* `Comparable`을 구현한 객체들의 배열은 다음과 같이 쉽게 정렬할 수 있다.
+	> `Arrays.sort(a);`
+* String과 같이 자바의 모든 값 클래스와 열거타입이 `Comparable`을 구현함
+	```java
+	public final class String
+		implements java.io.Serializable, Comparable<String>, CharSequence {
+	...
+	}
+	```
+### __compareTo__ 메서드 일반 규약
+`SGN`은 __signum function__ 을 뜻하고, 값이 음수:-1, 양수:1 을 반환하도록 정의
+
+* `SGN(X.compareTo(Y)) == -SGN(Y.compareTo(X))`
+* `X.compareTo(Y) > 0 && Y.compareTo(Z) > 0` 이면 `X.compareTo(Z) > 0`
+* `X.compareTo(Y) == 0` 이면 `SGN(X.compareTo(Z)) == SGN(Y.compareTo(Z))`
+* `(X.compareTo(Y) == 0 ) == (X.equals(Y))`
+	> _이 권고는 필수는 아니지만 꼭 지키는게 좋으며, 만약 지키지 않았다면 이 클래스의 순서는 equals 메서드와 일관되지 않는 다는 것을 명시해야 함_
 
 
+### 정리
+* 순서를 고려하는 값 클래스 작성시 `Comparable` 인터페이스를 구현해 해당 인스턴스를 쉽게 정렬, 검색, 비교할 수 있는 컬렉션과 어우러지도록 해야 한다.
+* `compareTo()`에서 필드 값 비교시 <, > 연산자는 사용하지 말자
+* 박싱된 기본 타입 클래스가 제공하는 정적 `compare()`나 `Compartor` 인터페이스가 제공하는 비교자 생성 메서드를 사용하자.
 -----------------------------------------------------------------
 [[TOC]](#목차)
 
