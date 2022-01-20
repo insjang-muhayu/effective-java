@@ -248,6 +248,7 @@ public interface Cloneable {
 	...
 	}
 	```
+
 ### __compareTo__ 메서드 일반 규약
 `SGN`은 __signum function__ 을 뜻하고, 값이 음수:-1, 양수:1 을 반환하도록 정의
 
@@ -257,6 +258,19 @@ public interface Cloneable {
 * `(X.compareTo(Y) == 0 ) == (X.equals(Y))`
 	> _이 권고는 필수는 아니지만 꼭 지키는게 좋으며, 만약 지키지 않았다면 이 클래스의 순서는 equals 메서드와 일관되지 않는 다는 것을 명시해야 함_
 
+### 비교자 활용 방식
+* __정적 compare 메서드__
+	```java
+	static Comparator<Object> hashOrder = new Comparator<>() {
+		public int compare(Object o1, Object o2){
+			return Integer.compare(o1.hashCode(), o2.hashCode());
+		}
+	}
+	```
+* __비교자 생성 메서드__
+	```java
+	static Comparator<Object> hashOrder = Comparator.comparingInt(o->o.hashCode);
+	```
 
 ### 정리
 * 순서를 고려하는 값 클래스 작성시 `Comparable` 인터페이스를 구현해 해당 인스턴스를 쉽게 정렬, 검색, 비교할 수 있는 컬렉션과 어우러지도록 해야 한다.
