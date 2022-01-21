@@ -18,6 +18,34 @@
 [[TOC]](#목차)
 
 ## item 15. 클래스와 멤버의 접근을 최소화해라
+: `[캡슐화]` 잘 설계된 컴포넌트는 내부구현을 숨기고, 구현과 API를 깔끔히 분리한다. 다른 컴포넌트와 API를 통해 소통한다.
+
+### __캡슐화(정보은닉)의 장점__
+* 여러 컴포넌트를 __병렬로 개발__ 하여 __개발 속도 향상__
+* 컴포넌트 교체부담 감소를 통해 __시스템 관리 비용 낮춤__
+* 타 컴포넌트에 영향없이 __컴포넌트 성능 최적화 가능__
+* 독립적으로 동작하는 컴포넌트는 __소프트웨어 재사용성 높임__
+* 개별 컴포넌트 동작 검증을 통해 큰 시스템의 __제작 난이도를 낮춤__
+
+__정보은닉__ 은 접근 `제한자(private, protected, public)`을 제대로 활용하는 것이 핵심
+
+### __접근 제한자 (private, protected, public)__
+* 모든 클래스와 멤버의 접근성을 가능한 제한해야 함
+* __Top Class & Interface__ 를
+	- `public` 선언 : 공개 API로 사용 (변경시 하위 호환을 항상 고려)
+	- `package-private` 선언 : 패키지 안에서만 사용 가능 (side-effect 없음)
+* __멤버 접근 제한자__
+	| Modifier		| TopClass	| Package	| SubClass	| World		|
+	| :------------	| :---:		| :---:		| :---:		| :---:		|
+	|**public**		|<b style='color:green'>Y</b>	|<b style='color:green'>Y</b>	|<b style='color:green'>Y</b>	|<b style='color:green'>Y</b>	|
+	|**protected**	|<b style='color:green'>Y</b>	|<b style='color:green'>Y</b>	|<b style='color:green'>Y</b>	|<b style='color:red'>X</b>		|
+	|**package-private**|<b style='color:green'>Y</b>	|<b style='color:green'>Y</b>	|<b style='color:red'>X</b>		|<b style='color:red'>X</b>		|
+	|**private**	|<b style='color:green'>Y</b>	|<b style='color:red'>X</b>		|<b style='color:red'>X</b>		|<b style='color:red'>X</b>		|
+
+### __모듈__
+* JAVA 9 부터 모듈 개념이 도입됨
+* __모듈은 패키지들의 묶음__
+* 패키지 중 공개(export)할 것들은 `module-info.java`에 선언
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
@@ -29,10 +57,12 @@
 
 ## item 17. 변경 가능성을 최소화해라
 
+
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
 ## item 18. 상속보단 컴포지션을 사용해라
+
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
