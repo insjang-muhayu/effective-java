@@ -52,6 +52,43 @@ __정보은닉__ 은 접근 `제한자(private, protected, public)`을 제대로
 
 ## item 16. public 클래스에서는 접근자 메서드를 사용하라
 
+### 접근자 방식
+```java
+	class Point{
+		private double x; private double y;
+
+		public Point(double x, double y) {
+			this.x = x; this.y = y;
+		}
+
+		public double getX() { return x; }
+		public double getY() { return y; }
+		public void setX(double x) { return this.x = x; }
+		public void setY(double y) { return this.y = y; }
+	}
+```
+
+### 불변 필드
+```java
+	public final class Time {
+		private static final int HOURS_PER_DAY = 24;
+		private static final int MINUTES_PER_DAY = 60;
+
+		public final int hour;
+		public final int minute;
+
+		public Time(int hour, int minute) {
+			if (hour < 0 || hour >= HOURS_PER_DAY) {
+				throw new IllegalArgumentException("시간 : "+ hour);
+			}
+			if (minute < 0 || minute >= MINUTES_PER_DAY) {
+				throw new IllegalArgumentException("분 : "+ hour);
+			}
+			this.hour = hour;
+			this.minute = minute;
+		}
+	}
+```
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
