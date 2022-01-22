@@ -51,6 +51,17 @@ __정보은닉__ 은 접근 `제한자(private, protected, public)`을 제대로
 [[TOC]](#목차)
 
 ## item 16. public 클래스에서는 접근자 메서드를 사용하라
+```java
+	class Point {
+		public double x;
+		public double y;
+	}
+```
+__단점 :__
+* 캡슐화 이점 제공하지 못함 (데이터 필드에 직접 접근 가능)
+* 내부 표현 변경시 API 수정 필요
+* 불변식 보장 불가능
+* 외부에서 필드 접근 시 부수 작업 수행 불가능
 
 ### 접근자 방식
 ```java
@@ -67,15 +78,17 @@ __정보은닉__ 은 접근 `제한자(private, protected, public)`을 제대로
 		public void setY(double y) { return this.y = y; }
 	}
 ```
+__public 클래스에서 이 방식은 확실히 맞다.__
 
 ### 불변 필드
+
 ```java
 	public final class Time {
 		private static final int HOURS_PER_DAY = 24;
 		private static final int MINUTES_PER_DAY = 60;
 
-		public final int hour;
-		public final int minute;
+		public final int hour;		// 불변 필드
+		public final int minute;	// 불변 필드
 
 		public Time(int hour, int minute) {
 			if (hour < 0 || hour >= HOURS_PER_DAY) {
@@ -89,11 +102,60 @@ __정보은닉__ 은 접근 `제한자(private, protected, public)`을 제대로
 		}
 	}
 ```
+__단점 :__
+* 내부 표현 변경시 API 수정 필요
+* 필드를 읽을 때 부수 작업 수행 불가
+
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
 ## item 17. 변경 가능성을 최소화해라
+### 불변 클래스 란?
+: 인스턴스의 내부 값을 수정할 수 없는 클래스
+* 객체 상태를 변경하는 메서드(변경자)를 제공하지 않는다.
+* 클래스를 확장할 수 없도록 한다.
+* 모든 필드를 `private final`로 선언한다.
+* 자신 외에는 내부 가변 컴포넌트에 접근할 수 없도록 한다. (방어적 복사)
 
+### 불변객체 장점
+* `thread safe` 하므로 동기화할 필요 없음
+* 자유롭게 공유할 수 있으며, 불변객체끼리는 내부 데이터를 공유 가능
+* 객체 생성시 다른 불변객체들을 구성요소로 사용 이점 (Map의 Key, Set의 원소)
+* 자체적으로 실패원자성(객체가 method 예외발생 후에도 동일 유효상태 유지됨) 제공
+
+클래스가 불변임을 보장하기 위해 :
+```java
+	public final class Complex { // 불변클래스
+		// 모든 필드는 private final로 선언
+		private final double re; 
+		private final double im;
+
+		// private, package-private 생성자
+		private Complex(double re, double im) { 			
+			this.re = re; this.im = im;
+		}
+
+		// public static 팩터리
+		public static Complex valueOf(double re, double im) {
+			return new Complex(re, im);
+		}
+	...
+	}
+```
+
+신뢰할 수 없는 하위클래스의 인스턴스인 경우, 
+이 인수들은 가변이라 가정하고 방어적 복사를 사용
+```java
+	public static BigInteger safeInsatance(BigInteger val) {
+		return val.getClass() == BigInteger.class ? val : new BigInteger(val.toByteArray());
+	}
+```
+
+### 요약
+* `Getter`가 있다고 해서 무조건 `Setter`를 구현하지 말자
+* 클래스는 꼭 필요한 경우가 아니라면 불변이어야 한다
+* 불변 클래스로 만들기 힘들면 변경할 수 있는 부분은 최대한 줄이자
+* 생성자는 불변식 설정이 모두 완료된 객체를 생성해야한다
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
