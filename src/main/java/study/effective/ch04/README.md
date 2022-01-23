@@ -235,8 +235,68 @@ __래퍼 클래스(`Wrapper class` == `Decorator pattern`)__ 는 단점이 거�
 [[TOC]](#목차)
 
 ## item 19. 상속을 고려해 설계하고 문서화해라
+* __[상속용 클래스]는 재정의(`public`과 `protected` 중 `final`이 아닌) 할 수 있는 메서드를 문서로 남겨야 함__
+	> __`@implSpec` 태그__ : "Implementation Requirements" 메서드의 내부 동작 방식을 설명하는 곳 (java 8부터 사용)
 
+	```java
+		/**
+		 * {@inheritDoc}
+		 *
+		 * @implSpec
+		 * This implementation iterates over the collection looking for the specified element.
+		 *
+		 * <p>Note that this implementation throws an {@code UnsupportedOperationException}
+		 * if the iterator returned by this collection's iterator method does not implement
+		 * the {@code remove} method and this collection contains the specified object.
+		 *
+		 * @throws UnsupportedOperationException {@inheritDoc}
+		 * @throws ClassCastException            {@inheritDoc}
+		 * @throws NullPointerException          {@inheritDoc}
+		 */
+		public boolean remove(Object o) {
+			Iterator<E> it = iterator();
+			if (o == null) {
+				while (it.hasNext()) {
+					if (it.next() == null) { it.remove(); return true; }
+				}
+			} else {
+				while (it.hasNext()) {
+					if (o.equals(it.next())) { it.remove(); return true; }
+				}
+			}
+			return false;
+		}
+	```
 
+* __[상속용 클래스]를 시험하는 방법은 직접 `Sub Class`를 만들어보는 것이 유일__
+	> `Sub Class`를 직접 구현해보면, `protected` 멤버의 필요 여부를 확인 가능
+
+* __[상속용 클래스]의 생성자는 직간접적으로 `Override Method`를 호출하면 안됨__
+	> `private`, `final`, `static` 메서드는 재정의 불가능하므로 생성자에서 호출 가능
+	```java
+		public class Super {
+			// 잘못된 예 : 생성자가 재정의 가능한 메서드 호출
+			public Super() { overrideMe(); }
+			public void overrideMe() { }
+		}
+	```
+	```java
+		public final class Sub extends Super {
+			private final Instant instant;
+
+			Sub() { instant = Instant.now(); }			
+			@Override public void overrideMe() { System.out.println(instant); }
+		}
+	```
+
+* __[상속용 클래스]에서 `Cloneable`, `Serializable`을 구현할지 정해야 한다면, `clone`과 `readObject` 모두 `Override Method`를 호출하면 안됨__
+	> `Override Method` 부터 호출되기 때문
+
+	> `Serializable` 을 구현한 [상속용 클래스]가 `readResolve`나 `writeReplace`를 갖는다면 이 메서드들은 `private`가 아닌 `protected`로 선언해야 한다.
+
+* __상속용으로 설계되지 않은 클래스는 상속을 금지해야 함__
+	- __`Final Class`__ 를 선언하는 방법
+	- 생성자를 `private` or `package-private`로 선언하고, __`Public Static Factory`__ 를 만들어주는 방법 ([ITEM-17](#item-17-%EB%B3%80%EA%B2%BD-%EA%B0%80%EB%8A%A5%EC%84%B1%EC%9D%84-%EC%B5%9C%EC%86%8C%ED%99%94%ED%95%B4%EB%9D%BC))
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
