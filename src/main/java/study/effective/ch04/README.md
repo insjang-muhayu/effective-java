@@ -2,17 +2,17 @@
 
 ## 목차
 
-- [x] item 15. [클래스와 멤버의 접근을 최소화해라](#item-15-%ED%81%B4%EB%9E%98%EC%8A%A4%EC%99%80-%EB%A9%A4%EB%B2%84%EC%9D%98-%EC%A0%91%EA%B7%BC%EC%9D%84-%EC%B5%9C%EC%86%8C%ED%99%94%ED%95%B4%EB%9D%BC)
-- [x] item 16. [public 클래스에서는 접근자 메서드를 사용하라](#item-16-public-%ED%81%B4%EB%9E%98%EC%8A%A4%EC%97%90%EC%84%9C%EB%8A%94-%EC%A0%91%EA%B7%BC%EC%9E%90-%EB%A9%94%EC%84%9C%EB%93%9C%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%98%EB%9D%BC)
-- [x] item 17. [변경 가능성을 최소화해라](#item-17-%EB%B3%80%EA%B2%BD-%EA%B0%80%EB%8A%A5%EC%84%B1%EC%9D%84-%EC%B5%9C%EC%86%8C%ED%99%94%ED%95%B4%EB%9D%BC)
-- [x] item 18. [상속보단 컴포지션을 사용해라](#item-18-%EC%83%81%EC%86%8D%EB%B3%B4%EB%8B%A8-%EC%BB%B4%ED%8F%AC%EC%A7%80%EC%85%98%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%B4%EB%9D%BC)
-- [x] item 19. [상속을 고려해 설계하고 문서화해라](#item-19-%EC%83%81%EC%86%8D%EC%9D%84-%EA%B3%A0%EB%A0%A4%ED%95%B4-%EC%84%A4%EA%B3%84%ED%95%98%EA%B3%A0-%EB%AC%B8%EC%84%9C%ED%99%94%ED%95%B4%EB%9D%BC)
-- [x] item 20. [추상 클래스보다 인터페이스를 우선하라](#item-20-%EC%B6%94%EC%83%81-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%B3%B4%EB%8B%A4-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4%EB%A5%BC-%EC%9A%B0%EC%84%A0%ED%95%98%EB%9D%BC)
-- [x] item 21. [인터페이스는 구현하는 쪽을 생각해 설계해라](#item-21-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4%EB%8A%94-%EA%B5%AC%ED%98%84%ED%95%98%EB%8A%94-%EC%AA%BD%EC%9D%84-%EC%83%9D%EA%B0%81%ED%95%B4-%EC%84%A4%EA%B3%84%ED%95%B4%EB%9D%BC)
-- [x] item 22. [인터페이스는 타입을 정의하는 용도로만 사용해라](#item-22-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4%EB%8A%94-%ED%83%80%EC%9E%85%EC%9D%84-%EC%A0%95%EC%9D%98%ED%95%98%EB%8A%94-%EC%9A%A9%EB%8F%84%EB%A1%9C%EB%A7%8C-%EC%82%AC%EC%9A%A9%ED%95%B4%EB%9D%BC)
-- [x] item 23. [태그 달린 클래스보다 클래스 계층구조를 활용해라](#item-23-%ED%83%9C%EA%B7%B8-%EB%8B%AC%EB%A6%B0-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%B3%B4%EB%8B%A4-%ED%81%B4%EB%9E%98%EC%8A%A4-%EA%B3%84%EC%B8%B5%EA%B5%AC%EC%A1%B0%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%B4%EB%9D%BC)
-- [x] item 24. [멤버 클래스는 되도록 static으로 구현해라](#item-24-%EB%A9%A4%EB%B2%84-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%8A%94-%EB%90%98%EB%8F%84%EB%A1%9D-static%EC%9C%BC%EB%A1%9C-%EA%B5%AC%ED%98%84%ED%95%B4%EB%9D%BC)
-- [x] item 25. [톱레벨 클래스는 한 파일에 하나만 생성해라](#item-25-%ED%86%B1%EB%A0%88%EB%B2%A8-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%8A%94-%ED%95%9C-%ED%8C%8C%EC%9D%BC%EC%97%90-%ED%95%98%EB%82%98%EB%A7%8C-%EC%83%9D%EC%84%B1%ED%95%B4%EB%9D%BC)
+- [x] item 15. [클래스와 멤버의 접근을 최소화해라](#item-15-클래스와-멤버의-접근을-최소화해라)
+- [x] item 16. [public 클래스에서는 접근자 메서드를 사용하라](#item-16-public-클래스에서는-접근자-메서드를-사용하라)
+- [x] item 17. [변경 가능성을 최소화해라 (불변 클래스)](#item-17-변경-가능성을-최소화해라-불변-클래스)
+- [x] item 18. [Inheritance보단 Composition을 사용해라](#item-18-inheritance보단-composition을-사용해라)
+- [x] item 19. [상속을 고려해 설계하고 문서화해라](#item-19-상속을-고려해-설계하고-문서화해라)
+- [x] item 20. [추상 클래스보다 인터페이스를 우선하라](#item-20-추상-클래스보다-인터페이스를-우선하라)
+- [x] item 21. [인터페이스는 구현하는 쪽을 생각해 설계해라](#item-21-인터페이스는-구현하는-쪽을-생각해-설계해라)
+- [x] item 22. [인터페이스는 타입을 정의하는 용도로만 사용해라](#item-22-인터페이스는-타입을-정의하는-용도로만-사용해라)
+- [x] item 23. [태그 달린 클래스보다 클래스 계층구조를 활용해라](#item-23-태그-달린-클래스보다-클래스-계층구조를-활용해라)
+- [x] item 24. [멤버 클래스는 되도록 static으로 구현해라](#item-24-멤버-클래스는-되도록-static으로-구현해라)
+- [x] item 25. [톱레벨 클래스는 한 파일에 하나만 생성해라](#item-25-톱레벨-클래스는-한-파일에-하나만-생성해라)
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
@@ -296,12 +296,169 @@ __래퍼 클래스(`Wrapper class` == `Decorator pattern`)__ 는 단점이 거�
 
 * __상속용으로 설계되지 않은 클래스는 상속을 금지해야 함__
 	- __`Final Class`__ 를 선언하는 방법
-	- 생성자를 `private` or `package-private`로 선언하고, __`Public Static Factory`__ 를 만들어주는 방법 ([ITEM-17](#item-17-%EB%B3%80%EA%B2%BD-%EA%B0%80%EB%8A%A5%EC%84%B1%EC%9D%84-%EC%B5%9C%EC%86%8C%ED%99%94%ED%95%B4%EB%9D%BC))
+	- 생성자를 `private` or `package-private`로 선언하고, __`Public Static Factory`__ 를 만들어주는 방법 ([ITEM-17](#item-17-변경-가능성을-최소화해라-불변-클래스))
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
 ## item 20. 추상 클래스보다 인터페이스를 우선하라
+
+### 다중 구현 메커니즘 (인터페이스 & 추상클래스)
+
+#### [추상클래스]
+
+
+#### [인터페이스]
+* __기존 클래스에 손쉽게 새로운 인터페이스를 구현할 수 있다__
+
+* __인터페이스는 mixin(믹스인) 정의에 안성맞춤이다__
+
+* __인터페이스로는 계층구조가 없는 타입 프레임워크를 만들 수 있다__
+	```java
+	public interface Singer { AudioClip sing(Song s); }
+	public interface SongWriter { Song compose(int chartPosition); }
+
+	public interface SingerSongWriter extends Singer, SongWriter {
+		AudioClip strum();
+		void actSensitive();
+	}
+	```
+* __Wrapper Class와 함께 사용하면, 인터페이스는 기능을 향상시키는 안전하고 강력한 수단이 된다__
+	```java
+	/**
+	 * Removes all of the elements of this collection that satisfy the given
+	 * predicate.  Errors or runtime exceptions thrown during iteration or by
+	 * the predicate are relayed to the caller.
+	 *
+	 * @implSpec
+	 * The default implementation traverses all elements of the collection using
+	 * its {@link #iterator}.  Each matching element is removed using
+	 * {@link Iterator#remove()}.  If the collection's iterator does not
+	 * support removal then an {@code UnsupportedOperationException} will be
+	 * thrown on the first matching element.
+	 *
+	 * @param filter a predicate which returns {@code true} for elements to be
+	 *        removed
+	 * @return {@code true} if any elements were removed
+	 * @throws NullPointerException if the specified filter is null
+	 * @throws UnsupportedOperationException if elements cannot be removed
+	 *         from this collection.  Implementations may throw this exception if a
+	 *         matching element cannot be removed or if, in general, removal is not
+	 *         supported.
+	 * @since 1.8
+	 */
+	default boolean removeIf(Predicate<? super E> filter) {
+		Objects.requireNonNull(filter);
+		boolean removed = false;
+		final Iterator<E> each = iterator();
+		while (each.hasNext()) {
+			if (filter.test(each.next())) {
+				each.remove();
+				removed = true;
+			}
+		}
+		return removed;
+	}
+	```
+
+* __골격구현 클래스는 추상 클래스처럼 구현을 도와주는 동시에 추상 클래스로 타입을 정의할 때 따라오는 제약에서 자유롭다__
+
+	골격 구현 작성은 다음 순서를 따르면 된다.
+	1. 다른 메서드들의 구현에 기반 메서드 선정
+	2. 기반 메서드들을 사용해 직접 구현할 수 있는 메서드를 모두 디폴트 메서드로 제공
+	3. 단 `equals()`, `hashCode()`는 제공하면 안된다.
+	4. 기반 메서드나 디폴트 메서드로 만들지 못한 메서드가 남아 있다면, 인터페이스를 구현하는 골격 구현 클래스를 만들어 남은 메서드를 작성
+	5. 골격 구현은 기본적으로 상속이므로, 설계 및 문서화 지침을 따라야 한다.
+
+	```java
+	// Map.Entry 인터페이스나 그 하위 인터페이스로는 이 골격구현 제공 불가능
+	// equals, hashCode, toString 재정의 할 수 없기 때문
+	public abstract class AbstractMapEntry<K,V> implements Map.Entry<K,V> {
+		// 변경 가능한 엔트리는 이 메서드를 반드시 재정의
+		@Override public V setValue(V value){
+			throw new UnsupportedOperationException();
+		}
+		// Map.Entry.equals의 일반 규약 구현
+		@Override public boolean equals(Object o){
+			if (o == this) return true;
+			if (!(o instanceof Map.Entry)) return false;
+			Map.Entry<?,?> e = (Map.Entry) o;
+			return Objects.equals(e.getKey(), getKey())
+					&& Objects.equals(e.getValue(), getValue());
+		}
+		// Map.Entry.hashCode 일반 규약 구현
+		@Override public int hashCode() {
+			return Objects.hashCode(getKey()) ^ Objects.hashCode(getValue());
+		}
+
+		@Override public String toString() {
+			return getKey() + "=" +getValue();
+		}
+	}
+	```
+* __단순구현은 골격구현의 작은 변종이다. 단순구현도 골격구현과 같이 상속을 위해 인터페이스를 구현한 것이지만, 추상클래스가 아니란 점이 다르다.__
+	```java
+		public static class SimpleEntry<K,V> implements Entry<K,V>, java.io.Serializable
+		{
+			private static final long serialVersionUID = -8499721149061103585L;
+
+			private final K key;
+			private V value;
+
+			public SimpleEntry(K key, V value) {
+				this.key   = key; 
+				this.value = value;
+			}
+			public SimpleEntry(Entry<? extends K, ? extends V> entry) {
+				this.key   = entry.getKey();
+				this.value = entry.getValue();
+			}
+
+			public K getKey() { return key; }
+
+			public V getValue() { return value; }
+			public V setValue(V value) {
+				V oldValue = this.value;
+				this.value = value;
+				return oldValue;
+			}
+
+			public boolean equals(Object o) {
+				if (!(o instanceof Map.Entry)) return false;
+				Map.Entry<?,?> e = (Map.Entry<?,?>)o;
+				return eq(key, e.getKey()) && eq(value, e.getValue());
+			}
+
+			public int hashCode() {
+				return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
+			}
+
+			public String toString() {
+				return key + "=" + value;
+			}
+		}
+	```
+
+### 템플릿 메서드 패턴
+인터페이스와 추상 골격 구현(Skeletal Implementation) 클래스를 함께 제공하는 방법
+```java
+	static List<Integer> intArrayAsList(int[] a){
+		Objects.requireNonNull(a);
+		// Java9부터 <> 연산자 사용가능. 낮은 버전은 <Integer>로 변경
+		return new AbstractList<>() {
+			// AbstractList의 abstract 메서드로 반드시 구현해야함
+			@Override public Integer get(int i) { return a[i]; }
+			// 선택적으로 구현
+			@Override public Integer set(int i, Integer val) {
+				int oldVal = a[i];
+				a[i] = val;
+				return oldVal;
+			}
+			// AbstractCollection의 abstract 메서드로 반드시 구현해야함
+			@Override public int size() { return a.length; }
+		}
+	}
+```
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
