@@ -304,48 +304,57 @@ __래퍼 클래스(`Wrapper class` == `Decorator pattern`)__ 는 단점이 거�
 ## item 20. 추상 클래스보다 인터페이스를 우선하라
 
 ### 다중 구현 메커니즘 (인터페이스 & 추상클래스)
+* 추상 클래스의 경우, 추상 클래스에서 정의한 메서드를 구현하는 클래스는 반드시 추상 클래스의 하위 클래스가 되어야 같은 타입으로 취급
+* 인터페이스의 경우, 인터페이스에서 정의한 메서드를 모두 정의한 클래스라면 다른 어떤 클래스를 상속했든 상관없이 같은 타입으로 취급
 
-#### [추상클래스]
 
-
-#### [인터페이스]
+### 인터페이스의 장점
 * __기존 클래스에 손쉽게 새로운 인터페이스를 구현할 수 있다__
 
 * __인터페이스는 mixin(믹스인) 정의에 안성맞춤이다__
+	> 믹스인이란? 어떤 클래스의 주 기능에 추가 기능을 혼합한 것이다. 쉽게 말해 다른 클래스에서 이용할 메소드를 포함한 클래스
+	```java
+	public class Employee implements Comparable<Employee>{
+		private int id;
+		public Employee(int id) { this.id = id; }
+		public int getId() { return id; }
+		public int printId() { return this.id; }
+		// 다른 Employee 클래스에서 이용할 compareTo 메소드 포함
+		@Override public int compareTo(Employee o) {
+			if (o.getId() < this.id) return -1;
+			else if (o.getId() == this.id) return 0;
+			else return 1;
+		}
+	}
+	```
 
 * __인터페이스로는 계층구조가 없는 타입 프레임워크를 만들 수 있다__
 	```java
-	public interface Singer { AudioClip sing(Song s); }
-	public interface SongWriter { Song compose(int chartPosition); }
+	public interface Singer { public void sing(); }
+	public interface SongWriter { public void compose(); }
+
+	public class People implements Singer, SongWriter{
+		@Override public void sing() {}
+		@Override public void compose() {}
+	}
 
 	public interface SingerSongWriter extends Singer, SongWriter {
 		AudioClip strum();
 		void actSensitive();
 	}
+
 	```
 * __Wrapper Class와 함께 사용하면, 인터페이스는 기능을 향상시키는 안전하고 강력한 수단이 된다__
 	```java
 	/**
-	 * Removes all of the elements of this collection that satisfy the given
-	 * predicate.  Errors or runtime exceptions thrown during iteration or by
-	 * the predicate are relayed to the caller.
-	 *
+	 * ...
 	 * @implSpec
 	 * The default implementation traverses all elements of the collection using
 	 * its {@link #iterator}.  Each matching element is removed using
 	 * {@link Iterator#remove()}.  If the collection's iterator does not
 	 * support removal then an {@code UnsupportedOperationException} will be
 	 * thrown on the first matching element.
-	 *
-	 * @param filter a predicate which returns {@code true} for elements to be
-	 *        removed
-	 * @return {@code true} if any elements were removed
-	 * @throws NullPointerException if the specified filter is null
-	 * @throws UnsupportedOperationException if elements cannot be removed
-	 *         from this collection.  Implementations may throw this exception if a
-	 *         matching element cannot be removed or if, in general, removal is not
-	 *         supported.
-	 * @since 1.8
+	 * ...
 	 */
 	default boolean removeIf(Predicate<? super E> filter) {
 		Objects.requireNonNull(filter);
@@ -360,107 +369,140 @@ __래퍼 클래스(`Wrapper class` == `Decorator pattern`)__ 는 단점이 거�
 		return removed;
 	}
 	```
+### 추상 골격 구현 클래스 (Skeletal Implementation)
 
-* __골격구현 클래스는 추상 클래스처럼 구현을 도와주는 동시에 추상 클래스로 타입을 정의할 때 따라오는 제약에서 자유롭다__
+인터페이스와 추상 골격 구현(Skeletal Implementation) 클래스를 함께 제공하는 방법
+* 인터페이스로는 타입을 정의
+* 메소드 구현이 필요한 부분은 추상 골격 구현 클래스에서 구현
 
-	골격 구현 작성은 다음 순서를 따르면 된다.
-	1. 다른 메서드들의 구현에 기반 메서드 선정
-	2. 기반 메서드들을 사용해 직접 구현할 수 있는 메서드를 모두 디폴트 메서드로 제공
-	3. 단 `equals()`, `hashCode()`는 제공하면 안된다.
-	4. 기반 메서드나 디폴트 메서드로 만들지 못한 메서드가 남아 있다면, 인터페이스를 구현하는 골격 구현 클래스를 만들어 남은 메서드를 작성
-	5. 골격 구현은 기본적으로 상속이므로, 설계 및 문서화 지침을 따라야 한다.
-
-	```java
-	// Map.Entry 인터페이스나 그 하위 인터페이스로는 이 골격구현 제공 불가능
-	// equals, hashCode, toString 재정의 할 수 없기 때문
-	public abstract class AbstractMapEntry<K,V> implements Map.Entry<K,V> {
-		// 변경 가능한 엔트리는 이 메서드를 반드시 재정의
-		@Override public V setValue(V value){
-			throw new UnsupportedOperationException();
-		}
-		// Map.Entry.equals의 일반 규약 구현
-		@Override public boolean equals(Object o){
-			if (o == this) return true;
-			if (!(o instanceof Map.Entry)) return false;
-			Map.Entry<?,?> e = (Map.Entry) o;
-			return Objects.equals(e.getKey(), getKey())
-					&& Objects.equals(e.getValue(), getValue());
-		}
-		// Map.Entry.hashCode 일반 규약 구현
-		@Override public int hashCode() {
-			return Objects.hashCode(getKey()) ^ Objects.hashCode(getValue());
-		}
-
-		@Override public String toString() {
-			return getKey() + "=" +getValue();
-		}
+```java
+public class IntArrays {
+	// public interface List<E> extends Collection<E> { ... }
+	
+	static List<Integer> intArrayAsList(int[] a) {
+		Objects.requireNonNull(a);
+		
+		// public abstract class AbstractList<E> 
+		//     extends AbstractCollection<E> implements List<E> { ... }
+		
+		// 추상 골격 구현 클래스를 구현해 반환
+		return new AbstractList<Integer>() { // 익명 클래스 형태
+			// AbstractList의 Abstract Method (반드시 구현)
+			@Override public Integer get(int i) { return a[i]; }
+			// AbstractCollection의 Abstract Method (반드시 구현)
+			@Override public int size() { return a.length; }
+			// Hook Method (선택적으로 구현)
+			@Override public Integer set(int i, Integer val) {
+				int oldVal = a[i];
+				a[i] = val;		// 오토언박싱
+				return oldVal;	// 오토박싱
+			}
+		};
 	}
-	```
-* __단순구현은 골격구현의 작은 변종이다. 단순구현도 골격구현과 같이 상속을 위해 인터페이스를 구현한 것이지만, 추상클래스가 아니란 점이 다르다.__
+}
+```
+
+###  골격 구현 작성 방법
+
+__골격구현 클래스는 추상 클래스처럼 구현을 도와주는 동시에 추상 클래스로 타입을 정의할 때 따라오는 제약에서 자유롭다__
+
+1. 다른 메서드들의 구현에 기반 메서드 선정
+2. 기반 메서드들을 사용해 직접 구현할 수 있는 메서드를 모두 디폴트 메서드로 제공
+	> 단 `equals()`, `hashCode()`는 제공하면 안된다.
+3. 기반 메서드나 디폴트 메서드로 만들지 못한 메서드가 남아 있다면, 인터페이스를 구현하는 골격 구현 클래스를 만들어 남은 메서드를 작성
+5. 골격 구현은 기본적으로 상속이므로, 설계 및 문서화 지침을 따라야 한다.
+
+```java
+// Map.Entry 인터페이스나 그 하위 인터페이스로는 이 골격구현 제공 불가능
+// equals, hashCode, toString 재정의 할 수 없기 때문
+public abstract class AbstractMapEntry<K,V> implements Map.Entry<K,V> {
+	// 변경 가능한 엔트리는 이 메서드를 반드시 재정의
+	@Override public V setValue(V value){
+		throw new UnsupportedOperationException();
+	}
+	// Map.Entry.equals의 일반 규약 구현
+	@Override public boolean equals(Object o){
+		if (o == this) return true;
+		if (!(o instanceof Map.Entry)) return false;
+		Map.Entry<?,?> e = (Map.Entry) o;
+		return Objects.equals(e.getKey(), getKey())
+				&& Objects.equals(e.getValue(), getValue());
+	}
+	// Map.Entry.hashCode 일반 규약 구현
+	@Override public int hashCode() {
+		return Objects.hashCode(getKey()) ^ Objects.hashCode(getValue());
+	}
+
+	@Override public String toString() {
+		return getKey() + "=" +getValue();
+	}
+}
+```
+
+### 단순 구현(Simple Implementation)
+
+* 골격구현의 작은 변종 (골격구현과 유사점)
+	> 상속을 위해 인터페이스를 구현
+* 추상클래스가 아님 (골격구현과 차이점)
+	> 그대로 사용하거나 필요에 맞게 확장 가능
+* 대표 예) __`AbstractMap.SimpleEntry`__
 	```java
-		public static class SimpleEntry<K,V> implements Entry<K,V>, java.io.Serializable
-		{
-			private static final long serialVersionUID = -8499721149061103585L;
+	public static class SimpleEntry<K,V> implements Entry<K,V>, java.io.Serializable
+	{
+		private static final long serialVersionUID = -8499721149061103585L;
 
-			private final K key;
-			private V value;
+		private final K key;
+		private V value;
 
-			public SimpleEntry(K key, V value) {
-				this.key   = key; 
-				this.value = value;
-			}
-			public SimpleEntry(Entry<? extends K, ? extends V> entry) {
-				this.key   = entry.getKey();
-				this.value = entry.getValue();
-			}
-
-			public K getKey() { return key; }
-
-			public V getValue() { return value; }
-			public V setValue(V value) {
-				V oldValue = this.value;
-				this.value = value;
-				return oldValue;
-			}
-
-			public boolean equals(Object o) {
-				if (!(o instanceof Map.Entry)) return false;
-				Map.Entry<?,?> e = (Map.Entry<?,?>)o;
-				return eq(key, e.getKey()) && eq(value, e.getValue());
-			}
-
-			public int hashCode() {
-				return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
-			}
-
-			public String toString() {
-				return key + "=" + value;
-			}
+		public SimpleEntry(K key, V value) {
+			this.key = key; this.value = value;
 		}
+		public SimpleEntry(Entry<? extends K, ? extends V> entry) {
+			this.key = entry.getKey(); this.value = entry.getValue();
+		}
+
+		public K getKey() { return key; }
+
+		public V getValue() { return value; }
+
+		public V setValue(V value) {
+			V oldValue = this.value;
+			this.value = value;
+			return oldValue;
+		}
+
+		public boolean equals(Object o) {
+			if (!(o instanceof Map.Entry)) return false;
+			Map.Entry<?,?> e = (Map.Entry<?,?>)o;
+			return eq(key, e.getKey()) && eq(value, e.getValue());
+		}
+
+		public int hashCode() {
+			return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
+		}
+
+		public String toString() { return key + "=" + value; }
+	}
 	```
 
 ### 템플릿 메서드 패턴
-인터페이스와 추상 골격 구현(Skeletal Implementation) 클래스를 함께 제공하는 방법
 ```java
-	static List<Integer> intArrayAsList(int[] a){
-		Objects.requireNonNull(a);
-		// Java9부터 <> 연산자 사용가능. 낮은 버전은 <Integer>로 변경
-		return new AbstractList<>() {
-			// AbstractList의 abstract 메서드로 반드시 구현해야함
-			@Override public Integer get(int i) { return a[i]; }
-			// 선택적으로 구현
-			@Override public Integer set(int i, Integer val) {
-				int oldVal = a[i];
-				a[i] = val;
-				return oldVal;
-			}
-			// AbstractCollection의 abstract 메서드로 반드시 구현해야함
-			@Override public int size() { return a.length; }
+	public abstract class Super {
+		public void templateMethod() { // 기본 알고리즘 코드
+			hookMethod();	// 선택적
+			abstractMethod();	// 필수적
 		}
-	}
-```
 
-월요일이라 어쩔 수 없이 가라 커밋..ㅠ.ㅠ (내일 정리하자..)
+		protected void hookMethod() {} // 선택적으로 오버라이드 가능
+		public abstract void abstractMethod(); // 반드시 SubClass에서 구현
+	}
+	public Sub extends Super {
+		@Override protected void hookMethod() { ...선택적... }
+
+		@Override public void abstractMethod() { ...필수적...  }
+	}
+
+```
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
