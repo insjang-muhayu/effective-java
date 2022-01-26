@@ -604,14 +604,18 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 	}
 
 	class Circle extends Figure {
+		// 4. 개별 의미의 데이터필드 추가
 		final double radius;
+
 		Circle(double radius) { this.radius = radius; }
 		// 5. 추상메서드 구현
 		@Override double area() { return Math.PI * (radius * radius); }
 	}
 
 	class Ractangle extends Figure {
+		// 4. 개별 의미의 데이터필드 추가
 		final double length; final double width;
+		
 		Ractangle(double length, double width) {
 			this.length = length; this.width = width;
 		}
