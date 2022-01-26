@@ -530,6 +530,24 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 [[TOC]](#목차)
 
 ## item 22. 인터페이스는 타입을 정의하는 용도로만 사용해라
+`인터페이스는 타입`을 정의하는 용도로만 사용해야하며, `상수 공개용 수단`으로 사용하면 안됨
+
+### __상수 공개용으로 적합한 수단__
+* __`Enum 타입`으로 공개__
+	```java
+	public enum Day{ MON, TUE, WED, THU, FRI, SAT, SUN};
+	```
+
+* __인스턴스화 할 수 없는 `유틸리티 클래스`로 공개__
+	```java
+	public class PysicalConstants{
+		private PysicalConstants(){}; // 인스턴스화 방지
+		public static final double AVOGARDROS_NUMBER = 6.022_140_857e23;
+		public static final double BOLTZMANN_CONSTANT = 1.380_648_52e-23;
+		public static final double ELECTRON_MASS = 9.109_383_56e-3;
+	}
+	```
+
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
