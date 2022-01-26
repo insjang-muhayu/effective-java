@@ -345,30 +345,7 @@ __래퍼 클래스(`Wrapper class` == `Decorator pattern`)__ 는 단점이 거�
 
 	```
 * __Wrapper Class와 함께 사용하면, 인터페이스는 기능을 향상시키는 안전하고 강력한 수단이 된다__
-	```java
-	/**
-	 * ...
-	 * @implSpec
-	 * The default implementation traverses all elements of the collection using
-	 * its {@link #iterator}.  Each matching element is removed using
-	 * {@link Iterator#remove()}.  If the collection's iterator does not
-	 * support removal then an {@code UnsupportedOperationException} will be
-	 * thrown on the first matching element.
-	 * ...
-	 */
-	default boolean removeIf(Predicate<? super E> filter) {
-		Objects.requireNonNull(filter);
-		boolean removed = false;
-		final Iterator<E> each = iterator();
-		while (each.hasNext()) {
-			if (filter.test(each.next())) {
-				each.remove();
-				removed = true;
-			}
-		}
-		return removed;
-	}
-	```
+
 ### 추상 골격 구현 클래스 (Skeletal Implementation)
 
 인터페이스와 추상 골격 구현(Skeletal Implementation) 클래스를 함께 제공하는 방법
@@ -508,6 +485,46 @@ public abstract class AbstractMapEntry<K,V> implements Map.Entry<K,V> {
 [[TOC]](#목차)
 
 ## item 21. 인터페이스는 구현하는 쪽을 생각해 설계해라
+생각할 수 있는 모든 상황에서 불변식을 해치지 않는 디폴트 메서드를 작성하기는 어렵다.
+
+
+```java
+	/**
+	 * ...
+	 * @implSpec
+	 * The default implementation traverses all elements of the collection using
+	 * its {@link #iterator}.  Each matching element is removed using
+	 * {@link Iterator#remove()}.  If the collection's iterator does not
+	 * support removal then an {@code UnsupportedOperationException} will be
+	 * thrown on the first matching element.
+	 * ...
+	 */
+	default boolean removeIf(Predicate<? super E> filter) {
+		Objects.requireNonNull(filter);
+		boolean removed = false;
+		final Iterator<E> each = iterator();
+		while (each.hasNext()) {
+			if (filter.test(each.next())) {
+				each.remove();
+				removed = true;
+			}
+		}
+		return removed;
+	}
+```
+### 예기치 못한 상황
+__`org.apache.commons.collections4.collection.SynchronizedCollection`__
+```java
+	public boolean removeIf(Predicate<? super E> filter) {
+		synchronized(this.lock) {
+			return this.decorated().removeIf(filter);
+		}
+	}
+```
+* 여러 스레드가 공유하는 환경에서 removeIf를 호출하면 ConcurrentModificationException이 발생하거나 다른 예상치 못한 결과로 이어질 수 있다.
+* 디폴트 메서드는 컴파일에 성공하더라도 기존 구현체에 런타임 오류를 일으킬 수 있다.
+* 디폴트 메서드가 생겼더라도, 인터페이스 설계할 때는 여전히 주의를 기울여야한다. 
+* 인터페이스를 릴리즈한 후라도 결함을 수정하는 것이 가능할 수는 있지만, 절대 그 가능성에 기대서는 안된다.
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
