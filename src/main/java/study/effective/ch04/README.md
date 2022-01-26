@@ -554,6 +554,76 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 
 ## item 23. 태그 달린 클래스보다 클래스 계층구조를 활용해라
 
+### __태그 달린 클래스 문제점__
+> 태그 달린 클래스는 장황하며, 오류를 내기 쉽고 비효율적
+```java
+	class Figure {
+		enum Shape { CIRCLE, RECTANGLE };
+		final Shape shape; // 태그 필드 
+
+		double radius; // CIRCLE 일때만 사용
+		double length; double width; // RECTANGLE 일때만 사용
+
+		Figure(double radius) { // CIRCLE 생성자
+			shape = Shape.CIRCLE;
+			this.radius = radius;
+		}
+
+		Figure(double length, double width) { // RECTANGLE 생성자
+			shape = Shape.RECTANGLE;
+			this.length = length; this.width = width;
+		}
+
+		double area() {
+			switch (shape) {
+				case RECTANGLE: return length * width;
+				case CIRCLE: return Math.PI * (radius * radius);
+				default: throw new AssertionError(shape);
+			}
+		}
+	}
+```
+* 열거타입 선언, 태그 필드, `switch`문 등 쓸데없는 코드가 많음 (장황)
+* 여러 구현이 한 클래스에 혼합되어 __가독성이 나쁨__
+* 다른 의미를 위한 코드도 있어, 메모리를 많이 사용
+* `final`로 필드를 선언하려면, 해당 의미에서 미사용 필드까지 생성자에서 초기화 필요
+* 다른 의미를 추가하려면 코드 수정이 필요
+* 인스턴스 타입만으로 현재 나타내는 의미를 알 길이 없음
+
+### __클래스 계층구조__
+#### __[구현방법]__
+1. 계층구조의 루트가 될 __추상클래스 정의__, 태그값에 따라 다른 동작 메서드들은 __추상메서드로 선언__
+2. 태그 값에 상관없이 동작이 일정한 메서드들은 __일반메서드로 추가__
+3. 모든 하위클래스에서 공통으로 사용하는 데이터필드도 루트클래스에 추가
+4. 루트클래스를 확장한 구체클래스를 의미별로 정의, 각 하위클래스에 각자 의미에 해당하는 데이터필드 추가
+5. 루트클래스가 정의한 추상메서드를 하위클래스에서 각자 의미에 맞게 구현
+```java
+	abstract class Figure { // 1. 추상클래스 정의
+		// 1. 추상메서드 선언 (태그에 따라 다른 동작)
+		abstract double area(); 
+	}
+
+	class Circle extends Figure {
+		final double radius;
+		Circle(double radius) { this.radius = radius; }
+		// 5. 추상메서드 구현
+		@Override double area() { return Math.PI * (radius * radius); }
+	}
+
+	class Ractangle extends Figure {
+		final double length; final double width;
+		Ractangle(double length, double width) {
+			this.length = length; this.width = width;
+		}
+		// 5. 추상메서드 구현
+		@Override double area() { return length * width; }
+	}
+```
+#### __[장점]__
+* 태그 달린 클래스의 단점을 모두 해소
+* 타입 사이의 자연스러운 계층관계를 반영하여 유연성 증대
+* 컴파일타임에 타입 검사 능력 향상
+
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
