@@ -615,7 +615,7 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 	class Ractangle extends Figure {
 		// 4. 개별 의미의 데이터필드 추가
 		final double length; final double width;
-		
+
 		Ractangle(double length, double width) {
 			this.length = length; this.width = width;
 		}
@@ -632,6 +632,29 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 [[TOC]](#목차)
 
 ## item 24. 멤버 클래스는 되도록 static으로 구현해라
+
+### 중첩 클래스 (Nested Class)
+> 다른 클래스 안에 정의된 클래스를 말한다. __중첩클래스__ 는 자신을 감싼 바깥 클래스에서만 사용돼야 하며, 그 외의 쓰임새가 있다면 __톱레벨클래스__ 로 만들어야한다.
+
+#### __[정적 멤버 클래스]__
+* 흔히 바깥 클래스와 함께 쓰이는 public 도우미 클래스로 쓰인다. 
+* 바깥 인스턴스와 독립적으로 인스턴스가 존재한다.
+* `private` 정적멤버클래스는 흔히 바깥 클래스가 표현하는 객체의 한 부분을 나타낼 때 사용한다.
+	```java
+	public class Caculator {
+		// 열거 타입도 정적 멤버 클래스 
+		public enum Operation { PLUS, MINUS }
+	}
+
+	public class Caculator {
+		// 보통 다음과 같이 선언
+		public static class Operation { }
+	}
+	```
+
+
+#### __[(비정적) 멤버 클래스]__
+
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
