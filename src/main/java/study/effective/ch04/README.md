@@ -755,12 +755,27 @@ public class LocalExam {
 }
 ```
 
-
-
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
 ## item 25. 톱레벨 클래스는 한 파일에 하나만 생성해라
+* __소스 파일 하나에는 반드시 톱레벨 클래스를 하나만 담자.__
+* 여러 톱레벨 클래스를 한 파일에 담고 싶다면, __정적멤버클래스__ 를 사용하는 방법을 고민해볼 수 있다.
+	```java
+	// Test.java
+	public class Test {
+		public static void main(String[] args) {
+			System.out.println(Utensil.NAME + Dessert.NAME);
+		}
+		private static class Utensil { // 정적멤버클래스
+			static final String NAME = "pan";
+		}
+		private static class Dessert { // 정적멤버클래스
+			static final String NAME = "cake";
+		}
+	}
+	```
+
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
