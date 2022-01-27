@@ -641,19 +641,120 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 * 바깥 인스턴스와 독립적으로 인스턴스가 존재한다.
 * `private` 정적멤버클래스는 흔히 바깥 클래스가 표현하는 객체의 한 부분을 나타낼 때 사용한다.
 	```java
-	public class Caculator {
-		// 열거 타입도 정적 멤버 클래스 
+	public class Caculator { 
+		// 열거타입도 정적멤버클래스 
 		public enum Operation { PLUS, MINUS }
 	}
 
 	public class Caculator {
-		// 보통 다음과 같이 선언
-		public static class Operation { }
+		// 정적멤버클래스
+		public static class Operation { } 
 	}
 	```
 
 
 #### __[(비정적) 멤버 클래스]__
+
+> 비정적멤버클래스의 인스턴스 안에 만들어져 메모리를 차지하며, 생성시간도 더 걸린다.   
+> 멤버클래스에서 바깥인스턴스에 접근할 일이 없다면 무조건 `static`을 붙여서 __정적멤버클래스__ 로 만들자.
+
+* 사용
+	- Adapter Pattern를 정의할 때 자주 쓰인다.
+	- 어떤 클래스의 인스턴스를 감싸 마치 다른 클래스의 인스턴스처럼 보이게 하는 뷰로 사용
+	- Map 인터페이스의 구현체에서 자신의 컬렉션 뷰를 구현할 때 사용
+	- Set과 List 같은 다른 컬렉션 인터페이스 구현들도 자신의 반복자를 구현할 때 비정적 멤버 클래스를 주로 사용
+
+* 비정적멤버클래스는 바깥인스턴스 없이 생성 불가
+```java
+public class NestedNonStaticExam {
+	private final String name;
+	public NestedNonStaticExam(String name) { this.name = name; }
+
+	public String getName() { // 멤버클래스 & 바깥클래스의 관계 확립
+		NonStaticClass nonStaticClass = new NonStaticClass("nonStatic : ");
+		return nonStaticClass.getNameWithOuter();
+	}
+
+	private class NonStaticClass { // 비정적멤버클래스
+		private final String nonStaticName;
+		public NonStaticClass(String name) { this.nonStaticName = name; }
+		
+		public String getNameWithOuter() { // 바깥클래스.this를 통해 메서드 사용가능
+			return nonStaticName + NestedNonStaticExam.this.getName();
+		}
+	}
+}
+```
+
+#### __[익명 클래스]__
+* 이름이 없으며, 바깥클래스의 멤버가 아님
+* 쓰이는 시점에 선언과 동시에 인스턴스가 생성됨
+* 어디서든 생성 가능하며, 오직 비정적인 문맥에서만 바깥클래스의 인스턴스 참조 가능
+* 상수정적변수 외에는 정적변수를 가질 수 없음
+* 제약사항 :
+	- 선언한 지점에만 인스턴스를 만들 수 있다.
+	- `instanceof` 검사나 클래스 이름이 필요한 작업은 수행 불가능
+	- 여러 인터페이스 구현 불가능
+	- 인터페이스를 구현하는 동시에 다른 클래스 상속 불가능
+	- 클라이언트는 익명 클래스가 상위 타입에서 상속한 멤버 외에는 호출 불가능
+	- 표현식 중간에 있어, 코드가 긴 경우 가독성이 떨어진다.
+
+> 람다(자바7)등장 이전에는 작은 함수객체나 처리객체 구현에 사용되었으며,  
+> __정적팩터리메서드__ 구현시 사용되기도 함
+
+```java
+public class AnonymousExam {
+	private double x; private double y;
+
+	public double operate() {
+		Operator operator = new Operator() { // 익명 클래스
+			@Override public double plus() {
+				System.out.printf("%f+%f=%f\n", x, y, x+y); return x + y;
+			}
+			@Override public double minus() {
+				System.out.printf("%f-%f=%f\n", x, y, x-y); return x - y;
+			}
+		};
+		return operator.plus();
+	}
+}
+
+interface Operator {
+	double plus();
+	double minus();
+}
+```
+
+
+#### __[지역 클래스]__
+> 중첩 클래스 중 가장 드물게 사용된다.
+* 지역클래스는 지역변수를 선언할 수 있는 곳이면 어디서든 선언 가능 
+* 유효범위는 지역변수와 동일
+* 멤버클래스 처럼 이름이 있으며, 반복해서 사용 가능
+* 익명클래스처럼 비정적문맥에서 사용될 떄만 바깥인스턴스 참조 가능
+* 정적멤버는 가질 수 없고, 가독성을 위해 짧게 작성해야 함
+
+```java
+public class LocalExam {
+	private int number;
+	public LocalExam(int number) { this.number = number; }
+
+	public void foo() {			
+		class LocalClass { // 지역변수처럼 선언해서 사용
+			private String name;
+			public LocalClass(String name) { this.name = name; }
+
+			public void print() { // 비정적 문맥에선 바깥인스턴스를 참조 가능
+				System.out.println(number + name);
+			}
+		}
+
+		LocalClass localClass = new LocalClass("local");
+		localClass.print();
+	}
+}
+```
+
 
 
 ---------------------------------------------------------------
