@@ -3,10 +3,10 @@
 ## 목차
 
 - [x] item 26. [Raw type은 사용하지 마라](#item-26-raw-type은-사용하지-마라)
-- [x] item 27. [비검사 경고를 제거해라](#item-27-비검사-경고를-제거해라)
-- [x] item 28. [배열보다는 리스트를 사용해라](#item-28-배열보다는-리스트를-사용해라)
-- [x] item 29. [이왕이면 제네릭 타입으로 만들어라](#item-29-이왕이면-제네릭-타입으로-만들어라)
-- [x] item 30. [이왕이면 제네릭 메서드로 만들어라](#item-30-이왕이면-제네릭-메서드로-만들어라)
+- [x] item 27. [Unchecked Warning을 제거해라](#item-27-unchecked-warning을-제거해라)
+- [x] item 28. [Array보다는 List를 사용해라](#item-28-array보다는-list를-사용해라)
+- [x] item 29. [이왕이면 Generic Type으로 만들어라](#item-29-이왕이면-generic-type으로-만들어라)
+- [x] item 30. [이왕이면 Generic Method로 만들어라](#item-30-이왕이면-generic-method로-만들어라)
 - [x] item 31. [한정적 와일드카드를 사용해 API 유연성을 높여라](#item-31-한정적-와일드카드를-사용해-api-유연성을-높여라)
 - [x] item 32. [제네릭과 가변인수를 함께 쓸 때는 신중해라](#item-32-제네릭과-가변인수를-함께-쓸-때는-신중해라)
 - [x] item 33. [타입 안전 이종 컨테이너를 고려해라](#item-33-타입-안전-이종-컨테이너를-고려해라)
@@ -130,7 +130,39 @@
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
-## item 27. 비검사 경고를 제거해라
+## item 27. Unchecked Warning을 제거해라
+할 수 있는 한 모든 Unchecked Warning을 제거하라
+```java
+	// Warning!! : unchecked conversion
+	Set<Lark> set = new HashSet(); 
+
+	// (자바7부터 지원) 다아아몬드 연산자(<>)로 해결
+	Set<Lark> set = new HashSet<>(); 
+```
+
+### @SuppressWarnings("unchecked")
+* 타입이 안전하다고 판단되면 Annotation을 활용해 경고를 숨김
+* `@SuppressWarnings`은 가능한 좁은 범위에 적용하라
+* `@SuppressWarnings("unchecked")` 사용시 경고를 무시해도 되는 사유를 주석 작성
+```java
+	public <T> T[] toArray(T[] a) {
+		if (a.length < size) {
+			// 생성배열과 매개변수로 받은 배열타입이 T[]와 같으므로 바른 형변환
+			@SuppressWarnings("unchecked") T[] result = 
+				(T[]) Arrays.copyOf(elements, size, a.getClass());
+			return result;
+		}
+		System.arraycopy(elements, 0, a, 0, size);
+		if (a.length > size) a[size] = null;
+
+		return a;
+	}
+```
+
+---------------------------------------------------------------
+[[TOC]](#목차)
+
+## item 28. Array보다는 List를 사용해라
 
 
 
@@ -139,7 +171,7 @@
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
-## item 28. 배열보다는 리스트를 사용해라
+## item 29. 이왕이면 Generic Type으로 만들어라
 
 
 
@@ -148,16 +180,7 @@
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
-## item 29. 이왕이면 제네릭 타입으로 만들어라
-
-
-
-
-
----------------------------------------------------------------
-[[TOC]](#목차)
-
-## item 30. 이왕이면 제네릭 메서드로 만들어라
+## item 30. 이왕이면 Generic Method로 만들어라
 
 
 
