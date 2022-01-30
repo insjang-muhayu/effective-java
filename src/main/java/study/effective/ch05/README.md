@@ -164,9 +164,161 @@
 
 ## item 28. Array보다는 List를 사용해라
 
+### __Array(Covariant)와 List(Invariant) 차이__
+
+* __Array : 공변 (Covariant)__
+	> 자기 자신과 자식 객체로 타입 변환을 허용해주는 것
+	```java
+		Object[] objects = new Long[1];
+
+		objects[0] = "ArrayStoreException : 타입이다름"; // 오류!!
+		Assertions.assertThrows(ArrayStoreException.class,
+			() -> objects[0] = "ArrayStoreException : 타입이다름");
+	```
+	- `Array(공변)`는 타입이 다른 경우 런타임 `ArrayStoreException` 오류 발생
 
 
+* __List : 불공변 (Invariant)__
+	> __`List<String> != List<Object>`__ : 두 타입은 전혀 관련이 없다는 의미
+	```java
+		public class Test {
+			public static void test(List<Object> list) { }
+			public static void main(String[] args) {
+				List<String> list = new ArrayList<>();
+				list.add("Gyunny");
+				test(list);   // 컴파일 에러
+			} 
+		}
+	```
+	- `List(불공변)`는 컴파일 오류 발생
 
+### __타입__
+> 배열은 구체화(reify)가 되고, 제네릭은 비구체화(non-reify)가 된다.
+
+* __구체화 타입 (Reifiable Type)__
+	> 자신의 타입정보를 런타임에도 알고 있는 것
+
+* __비구체화 타입 (Non-Reifiable Type)__
+	- 비구체화 타입은 런타임 시에 소거 되기 때문에 런타임에는 컴파일타임보다 타입정보를 적게 가짐
+	- `E`, `List<E>`, `List<String>` 과 같은 타입을 실체화 불가 타입이라고 함
+
+* __제네릭 타입 소거 (Generic Type Erasure)__
+	> 컴파일타임에만 타입 제약 조건을 정의하고, 런타임에는 타입을 제거
+	- __Unbounded Type(`<?>`, `<T>`)은 `Object`로 변환__
+		```java
+		// 컴파일 시 (타입 소거 전)
+		public static <T> int count(T[] anArray, T elem) {
+			int cnt = 0;
+			for (T e : anArray) { if (e.equals(elem)) ++cnt; }
+			return cnt;
+		}
+		```
+		```java
+		// 런타임 시 (타입 소거 후)
+		public static int count(Object[] anArray, Object elem) {
+			int cnt = 0;
+			for (Object e : anArray) { if (e.equals(elem)) ++cnt; }
+			return cnt;
+		}
+		```
+	- __Bound Ttype(`<E extends Comparable>`)의 경우는 `Comparable`로 변환__
+		```java
+		// 컴파일 시 (타입 소거 전)
+		public static <T extends Shape> void draw(T shape) { /* ... */ }
+		```
+		```java
+		// 런타임 시 (타입 소거 후)
+		public static void draw(Shape shape) { /* ... */ }
+		```
+
+	- 제네릭 타입을 사용할 수 있는 일반 클래스, 인터페이스, 메소드에만 소거 규칙을 적용
+	- 타입 안정성 보존을 위해 필요시 type casting
+	- __확장된 제네릭 타입에서 다형성을 보존하기위해 `bridge method` 생성__
+		```java
+		public class Node<T> {
+			public T data;
+			public Node(T data) { this.data = data; }
+			public void setData(T data) {
+				System.out.println("Node.setData");
+				this.data = data;
+			}
+		}
+
+		public class MyNode extends Node<Integer> {
+			public MyNode(Integer data) { super(data); }
+
+			public void setData(Integer data) {
+				System.out.println("MyNode.setData");
+				super.setData(data);
+			}
+		}
+		```
+		```java
+		MyNode mn = new MyNode(5);
+		Node n = (MyNode)mn;	// A raw type - compiler throws an unchecked warning
+		n.setData("Hello");		// Causes a ClassCastException to be thrown.
+		Integer x = (String)mn.data; // ClassCastException 오류 발생
+		```
+
+### __Array -> Generic__
+
+* __Array__
+	```java
+	public class ChooserArray {
+		private final Object[] choiceArray;
+
+		public ChooserArray(Collection choices) {
+			this.choiceArray = choices.toArray();
+		}
+
+		// 컬렉션안의 원소 중 하나를 무작위로 선택해 반환
+		// 반환된 Object를 원하는 타입으로 형변환 필요
+		// -> 타입이 다른게 들어가 있는 경우 런타임 오류 발생
+		public Object choose() {
+			Random rnd = ThreadLocalRandom.current();
+			return choiceArray[rnd.nextInt(choiceArray.length)];
+		}
+	}
+	```
+	- 위 클래스의 경우 `choose()`를 호출할 때 반환된 `Object`를 원하는 타입으로 형변환 해야하며,
+	- 이때 다른 타입의 원소가 들어 있다면 런타임 오류가 발생함
+	- 이 경우 런타임 오류가 발생하지 않도록 `Generic`으로 변경 해주는 것이 좋음
+
+* __Generic__
+	```java
+	package ch5.dahye.item28;
+	import java.util.Collection;
+
+	public class ChooserGeneric<T> {
+		private final T[] choiceArray;
+
+		public ChooserGeneric(Collection<T> choices) {
+			this.choiceArray = (T[]) choices.toArray();
+			// incompatible types 오류 -> (T[])로 형변환 필요
+			// [경고발생] Unchecked cast: 'java.lang.Object[]' to 'T[]'
+		}
+	}
+	```
+	- __`T`__ 가 무슨타입인지 모르므로, 컴파일러는 형변환이 런타임에도 안전한지 보장 못함
+	- (Generic은 원소의 타입정보가 소거되어 런타임시 타입을 알 수 없음)
+
+* __비검사 형검사 경고 제거__
+	```java
+	public class Chooser<T> {
+		private final List<T> choiceList;
+
+		public Chooser(Collection<T> choices) {
+			this.choiceList = new ArrayList<>(choices);
+		}
+
+		public T choose() {
+			Random rnd = ThreadLocalRandom.current();
+			return choiceList.get(rnd.nextInt(choiceList.size()));
+		}
+	}
+	```
+	- `Array` 대신 `List`를 사용하여, 형변환 경고를 제거 가능
+	- __Runtime__ 시에 `ClassCastException`이 발생할 일도 없음
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
