@@ -325,7 +325,70 @@
 
 ## item 29. 이왕이면 Generic Type으로 만들어라
 
+### __[배열을 사용한 코드를 제네릭으로 만드는 방법]__
 
+* __방법1. 제네릭 배열 생성 금지 제약 우회__
+	- `@SuppressWarnings("unchecked")` 을 추가하여, 경고문구가 발생을 숨김 
+	- 명시적으로 형변환을 하지 않고도 `ClassCastException` 을 걱정없이 사용 가능
+
+* __방법2. Object[]로 타입 변경__
+	- `elems` 의 타입을 `Object[]`로 변경하는 방법
+	- 제네릭 타입 안에서 리스트를 사용하는 것이 항상 가능한 것도, 좋은 것도 아니다.
+
+```java
+	public class Stack<E> { // GenericType
+		// private으로 저장
+		private E[] elems; // GenericType
+		private int size = 0;
+		private static final int INIT_CAPACITY = 16;
+
+		@SuppressWarnings("unchecked") // [방법1] 어노테이션 추가 !!!
+		public Stack() {
+			// elems = new E[INIT_CAPACITY]; // Unchecked cast: 'Object[]' to 'E[]' 
+			elems = (E[]) new E[INIT_CAPACITY]; // [방법1]
+		}
+
+		public void push(E e) {
+			ensureCapacity(); 
+			elems[size++] = e;
+		}
+
+		public E pop() {
+			if (isEmpty()) throw new EmptyStackException();
+
+			// E result = (E) elems[size--]; // Unchecked cast: 'Object' to 'E'
+			@SuppressWarnings("unchecked") E result = (E) elems[size--]; // [방법2]
+			elems[size] = null; // 다 쓴 참조 해제
+			return result;
+		}
+
+		public boolean isEmpty() { return size == 0; }
+
+		private void ensureCapacity() {
+			if (elems.length == size) elems = Arrays.copyOf(elems, 2 * size + 1);
+		}
+	}
+```
+
+### __[제네릭 Stack을 사용하는 맛보기 프로그램]__
+
+> 대부분 제네릭타입은 타입매개변수에 아무런 제약을 두지 않으며,  
+> `Stack<Object>, Stack<int[]>, Stack<List<String>>` 등 어떤 참조타입으로도 생성 가능   
+> __(단, 기본타입(`Stack<int>, Stack<double>`)은 사용할 수 없다)__
+
+```java
+	public static void main(String[] args) {
+		Stack<String> stack = new Stack<>();
+		for (String itm : args) stack.push(itm);
+		while (!stack.isEmpty()) System.out.println(stack.pop().toUpperCase());
+	}
+```
+
+### __[타입 매개변수에 제약을 두는 제네릭 타입]__
+
+```java
+	public class DelayQueue<E extends Delayed> implements BlockingQueue<E>
+```
 
 
 
