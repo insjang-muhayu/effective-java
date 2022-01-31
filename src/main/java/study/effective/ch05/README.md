@@ -551,8 +551,47 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 
 ## item 32. 제네릭과 가변인수를 함께 쓸 때는 신중해라
 
+### @SafeVarargs
+* 제네릭 가변인수 메서드의 타입 안전이 확실히 보장될 때는  
+	Java 7부터 @SafeVarargs 어노테이션으로 경고문구를 숨길 수 있다. 
+* 메서드가 안전한 경우 :
+	- varargs 매개변수 배열에 아무것도 저장하지 않는다.
+	- 배열 혹은 복제본을 신뢰할 수 없는 코드에 노출하지 않는다.
 
+* `varargs` 매개변수를 안전하게 사용하는 전형적인 예
+	```java
+	@SafeVarargs
+	static <T> List<T> flatten(List<? extends T>... lists) {
+		List<T> result = new ArrayList<>();
+		for (List<? extends T> list : lists) result.addAll(list);
+		return result;
+	}
+	```
+### List.of
+* 정적 팩터리 메서드인 List.of를 활용해 메서드에 임의의 인수를 넘길 수 있다. (List.of 에 @SafeVarargs가 있기때문에 가능)
+* __장점__ 은 컴파일러가 메서드 타입 안정성을 검증할 수 있는데 있다.  
+	프로그래머가 @SafeVarargs 어노테이션을 달지 않아도 되며,  
+	실수로 안전하다고 판단할 걱정도 없다. 
+* __단점__ 은 클라이언트 코드가 살짝 지저분해지고,  
+	속도가 약간 느려질 수 있다는 점이다.
+	```java
+	public class VarargsTest {
+		@Test
+		void heapPollutionTest() {
+			List<String> attrs = pickTwo("좋은", "빠른", "저렴한");
+			System.out.println("attrs = " + Arrays.toString(attrs));
+		}
 
+		static <T> List<T> pickTwo(T a, T b, T c) {
+			switch (ThreadLocalRandom.current().nextInt(3)) {
+				case 0: return List.of(a, b);
+				case 1: return List.of(a, c);
+				case 2: return List.of(b, c);
+			}
+			throw new AssertionError();
+		}
+	}
+	```
 
 
 ---------------------------------------------------------------
