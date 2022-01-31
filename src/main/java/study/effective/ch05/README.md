@@ -14,7 +14,7 @@
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
-## item 26. Raw type은 사용하지 마라
+
 
 | 한글                     | 영어                    | 예                                 |
 | ------------------------ | ----------------------- | ---------------------------------- |
@@ -30,6 +30,9 @@
 | 제네릭 메서드            | Generic method          | `static <E> List<E> asList(E[] a)` |
 | 타입 토큰                | type token              | `String.class`                     |
 
+## __item 26. Raw type은 사용하지 마라__
+
+### __ClassCastException 경고 발생__
 
 * __Raw type : runtime 오류__
 	```java
@@ -95,8 +98,9 @@
 	}
 	```
 
-### 비한정적 와일드카드 타입(Unbounded wildcard type)
-* `제네릭타입<?>` : 제한없음(타입 파라미터를 대치하는 구체적 타입으로 모든 클래스나 인터페이스 타입이 올 수 있다)
+### __비한정적 와일드카드 타입(Unbounded wildcard type)__
+
+* `제네릭타입<?>` : 제한없음 (타입파라미터를 대치하는 구체적타입으로 모든 클래스나 인터페이스 타입이 올 수 있다)
 	```java
 	// 비한정적 와일드카드 타입을 사용하라 - 타입 안전하며 유연
 	static int numElemnetsInCommon(Set<?> s1, Set<?> s2) {
@@ -108,7 +112,7 @@
 	}
 	```
 
-### 예외케이스
+### __예외케이스__
 
 * __class 리터럴에는 Raw type을 사용해야한다.__
 	- 자바 명세는 class 리터럴에 매개변수화 타입을 사용하지 못하게 했다.(배열과 기본 타입은 허용)
@@ -131,6 +135,7 @@
 [[TOC]](#목차)
 
 ## item 27. Unchecked Warning을 제거해라
+
 할 수 있는 한 모든 Unchecked Warning을 제거하라
 ```java
 	// Warning!! : unchecked conversion
@@ -140,7 +145,7 @@
 	Set<Lark> set = new HashSet<>(); 
 ```
 
-### @SuppressWarnings("unchecked")
+### __@SuppressWarnings("unchecked")__
 * 타입이 안전하다고 판단되면 Annotation을 활용해 경고를 숨김
 * `@SuppressWarnings`은 가능한 좁은 범위에 적용하라
 * `@SuppressWarnings("unchecked")` 사용시 경고를 무시해도 되는 사유를 주석 작성
@@ -390,15 +395,83 @@
 	public class DelayQueue<E extends Delayed> implements BlockingQueue<E>
 ```
 
-
-
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
 ## item 30. 이왕이면 Generic Method로 만들어라
 
+### __제네릭 메서드__
+> __제네릭 메서드__ 로 바꿔주면 경고문구가 뜨지 않으며, 타입안전성도 지켜지는 것을 확인 가능
+
+__[제네릭 메서드]__
+```java
+	public static <E> Set<E> union(Set<E> s1, Set<E> s2) {
+		Set<E> result = new HashSet<>(s1); // raw type
+		result.addAll(s2);
+		return result;
+	}
+```
+__[제네릭 메서드를 활용하는 간단한 프로그램]__
+```java
+	public static void main(String[] args) {
+		Set<String> guys = Set.of("톰", "딕", "해리");
+		Set<String> stooges = Set.of("래리", "모에", "컬리");
+		Set<String> aflCio = union(guys, stooges);
+		System.out.println(aflCio); // [모에, 톰, 해리, 래리, 컬리, 딕]
+	}
+```
+
+### __제네릭 싱글턴 팩터리__
+> 때때로 불변객체를 여러 타입으로 활용할 수 있게 만들어야 하는 경우가 있다.   
+> 요청한 타입매개변수에 맞게 매번 그 객체타입을 바꿔주는 __제네릭 싱글턴 팩터리__ 를 이용해 구현 가능
+
+```java
+	public class GenericMethodTest {
+		private static UnaryOperator<Object> IDNTITY_FN = (t) -> t;
+
+		@SuppressWarnings("unchecked")
+		private static <T> UnaryOperator<T> identityFunction() {
+			return (UnaryOperator<T>) IDNTITY_FN;
+		}
+
+		public static void main(String[] args) {
+			String[] strings = {"faker", "keria", "teddy"};
+			UnaryOperator<String> sameString = identityFunction();
+			for (String s : strings) {
+				System.out.println(sameString.apply(s));
+			}
+
+			Number[] numbers = {1, 2.0, 3L};
+			UnaryOperator<Number> sameNumber = identityFunction();
+			for (Number n : numbers) {
+				System.out.println(sameNumber.apply(n));
+			}
+		}
+	}
+```
 
 
+
+### __재귀적 타입 한정 (Recursive Type Bound)__
+자기 자신이 들어간 표현식을 사용하여, 타입 매개변수의 허용범위를 한정하는 `Recursive Type Bound` 개념이 있다. `Recursive Type Bound`은 주로 타입의 순서를 정하는 `Comparable` 과 함께 사용한다.
+```java
+public interface Comparable<T> {
+	public int compareTo(T o);
+}
+```
+타입한정인 `<E extends Comparable<E>>`는 "모든 타입 E는 자신과 비교할 수 있다"라는 의미로 해석할 수 있으며, 상호 비교가 가능하다는 것을 의미
+```java
+public static <E extends Comparable<E>> E max(Collection<E> c) {
+	if (c.isEmpty()) throw new IllegalArgumentException("collection is empty");
+
+	E result = null;
+	for (E e : c) {
+		if (result == null || e.compareTo(result) > 0) 
+			result = Objects.requireNonNull(e);
+	}
+	return result;
+}
+```
 
 
 ---------------------------------------------------------------
