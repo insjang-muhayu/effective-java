@@ -479,8 +479,71 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 
 ## item 31. 한정적 와일드카드를 사용해 API 유연성을 높여라
 
+### __경계 와일드카드 (Bounded Wildcard)__
+경계 와일드카드(`Bounded Wildcard`)를 이용해서 해결 예시
+```java
+//	public void pushAll(Iterable<E> src) { // [e1] compile error
+//		==> upper bounded wildcard 로 해결
+	public void pushAll(Iterable<? extends E> src) {
+		for (E e : src) push(e);
+	}
 
+//	public void popAll(Collection<E> dst) { // [e2]
+//		==> lower bounded wildcard 로 해결
+	public void popAll(Collection<? super E> dst) { 
+		while (!isEmpty()) dst.add(pop());
+	}
 
+	public static void main(String[] args) {
+		Stack<Number> stack = new Stack<>();
+
+		Iterable<Integer> integers = ...;
+		// [e1] : (Iterable<Number> != Iterable<Integer>) compile error
+		stack.pushAll(integers); 
+
+		Collection<Object> objects = ...;
+		// [e2] : (Collection<Object> != Collection<Number>) compile error
+		stack.popAll(objects); 
+	}
+```
+
+### __PECS__
+어떤 와일드 카드를 사용해야 하는지 기억하는데 있어서 `PECS` 공식 활용
+
+* __PECS : producer - extends, consumer - super__
+* T가 생산자이면 상한경계와일드카드(`<? extends E>`)를 사용
+* T가 소비자이면 하한경계와일드카드(`<? super E>`)를 사용
+```java
+//	public static <E extends Comparable<E>> E max(List<E> c) {
+	public static <E extends Comparable<? super E>> E max(List<? extends E> c) {
+		if (c.isEmpty()) throw new IllegalArgumentException("collection is empty");
+
+		E result = null;
+		for (E e : c) {
+			if (result == null || e.compareTo(result) > 0) 
+				result = Objects.requireNonNull(e);
+		}
+
+		return result;
+	}
+```
++ __`List<E>` :--> `List<? extends E>`__ : 입력매개변수는 `E`인스턴스를 생성
+* __`Comparable<E>` :--> `Comparable<? super E>`__ : `Comparable`은 언제나 소비자 역할
+* `Comparable`와 `Comparator`는 모두 소비자이다.
+* 메서드선언에 타입 매개변수가 한번만 나오면 wildcard로 대체하는 것이 좋다.
+
+### __private static helper 메서드__
+컴파일러는 변수에 잘못된 타입의 값을 할당하고 있다고 믿는다는 것을 의미
+```java
+	public static void swap(List<?> list, int i, int j) {
+	//	list.set(i, list.set(j, list.get(i)));
+		swapHelper(list, i, j);
+	};
+	// Helper method created so that the wildcard can be captured through type inference.
+	public static <E> void swapHelper(List<E> list, int i, int j) {
+		list.set(i, list.set(j, list.get(i)));
+	};
+```
 
 
 ---------------------------------------------------------------
