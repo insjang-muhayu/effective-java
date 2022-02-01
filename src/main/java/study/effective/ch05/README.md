@@ -557,7 +557,6 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 * 메서드가 안전한 경우 :
 	- varargs 매개변수 배열에 아무것도 저장하지 않는다.
 	- 배열 혹은 복제본을 신뢰할 수 없는 코드에 노출하지 않는다.
-
 * `varargs` 매개변수를 안전하게 사용하는 전형적인 예
 	```java
 	@SafeVarargs
@@ -599,7 +598,75 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 
 ## item 33. 타입 안전 이종 컨테이너를 고려해라
 
+### 타입안전이종컨테이너 (type safe heterogeneous container)
 
+* 패턴 (pattern)
+	* 컨테이너 대신 키를 타입 매개변수화 한다.
+	* 컨테이너에서 값을 넣거나 뺄 때 매개변수화한 키를 함께 제공한다.
+	* 제네릭 타입 시스템이 값의 타입이 키와 같음을 보장해준다
+* 제약
+	* client가 Class객체를 Generic이 아닌 RawType으로 넘기면 안전성이 깨짐
+		> `cast() ` 활용해 해결  : `public class Class<T> { T cast(Object obj); }`
+	* 실체화불가타입(`List<String>, List<Integer>`)에는 사용 불가
+		> `List<String>, List<Integer>` 는 Class 객체를 얻을 수 없음 (둘다 List.class 를 공유)
+```java
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+public class Favorites {
+	private Map<Class<?>, Object> favorites = new HashMap<>();
+
+	// [제약2] 실체화불가타입(List<String>, List<Integer>)에는 사용할 수 없다
+	public <T> void putFavorite(Class<T> type, T instance) {
+		// [제약1] client가 Class객체를 Generic이 아닌 RawType으로 넘기면 안전성이 깨짐
+		// favorites.put(Objects.requireNonNull(type), instance);
+		favorites.put(Objects.requireNonNull(type), type.cast(instance));
+	}
+	public <T> T getFavorite(Class<T> type) {
+		return type.cast(favorites.get(type));
+	}
+
+	public static void main(String[] args) {
+		Favorites f = new Favorites();
+		f.putFavorite(String.class, "Java");
+		f.putFavorite(Integer.class, 0xcafebabe);
+		f.putFavorite(Class.class, Favorites.class);
+
+		String favStr = f.getFavorite(String.class);
+		int favInt = f.getFavorite(Integer.class);
+		Class<?> favCls = f.getFavorite(Class.class);
+
+		System.out.printf("%s %x %s%n", favStr, favInt, favCls.getName()); 
+		// 출력 : Java cafebabe Favorites
+	}
+}
+```
+
+### 한정적 타입 토큰
+* 만약 타입을 제한하고 싶다면 __한정적 타입 토큰__ 을 활용하면 된다.
+* __한정적 타입 토큰__ : "한정적 타입 매개변수"나 "한정적 와일드카드"를 사용하여 표현가능한 타입을 제한하는 타입토큰
+* annotationType 인수는 애터테이션 타입을 뜻하는 한정적 타입 토큰이다.
+	```java
+	// annotationType 인수는 어노테이션 타입을 뜻하는 한정적 타입토큰
+	public <T extends Annotation> T getAnnotation(Class<T> annotationType);
+	```
+* 어노테이션 요소는 그 키가 어노테이션 타입인, 타입안전이종컨테이너이다.
+* `Class<?>` 타입의 객체를 한정적 타입 토큰을 받는 메서드에 넘기고 싶을 때 `asSubclass()` 활용  
+	> `asSubclass() 메서드`: 호출된 인스턴스 자신의 Class 객체를 인수가 명시한 클래스로 형변환
+
+	```java
+	static Annotation getAnnotation(AnnotatedElement element, String annotationTypeName) {
+		Class<?> annotationType = null; //비한정적 타입 토큰
+		try {
+			annotationType = Class.forName(annotationTypeName);
+		} catch (Exception ex) {
+			throw new IllegalArgumentException(ex);
+		}
+
+		return element.getAnnotation(annotationType.asSubclass(Annotation.class));
+	}
+	```
 
 
 ---------------------------------------------------------------
