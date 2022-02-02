@@ -2,14 +2,14 @@
 
 ## 목차
 
-- [x] item 34. [int 상수 대신 EnumType을 사용해라]](CCC)
-- [x] item 35. [ordinal 메서드 대신 인스턴스 필드를 사용해라]](CCC)
-- [x] item 36. [비트 필드 대신 EnumSet을 사용해라]](CCC)
-- [x] item 37. [ordinal 인덱싱 대신 EnumMap을 사용해라]](CCC)
-- [x] item 38. [확장할 수 있는 EnumType이 필요하면 Interface를 사용해라]](CCC)
-- [x] item 39. [명명 패턴보다 Annotation을 사용해라]](CCC)
-- [x] item 40. [@Override Annotation을 일관되게 사용해라]](CCC)
-- [x] item 41. [정의하려는 것이 타입이라면 Marker Interface를 사용해라]](CCC)
+- [x] item 34. [int 상수 대신 EnumType을 사용해라](#item-34-int-상수-대신-enumtype을-사용해라)
+- [x] item 35. [ordinal 메서드 대신 인스턴스 필드를 사용해라](#item-35-ordinal-메서드-대신-인스턴스-필드를-사용해라)
+- [x] item 36. [비트 필드 대신 EnumSet을 사용해라](#item-36-비트-필드-대신-enumset을-사용해라)
+- [x] item 37. [ordinal 인덱싱 대신 EnumMap을 사용해라](#item-37-ordinal-인덱싱-대신-enummap을-사용해라)
+- [x] item 38. [확장할 수 있는 EnumType이 필요하면 Interface를 사용해라](#item-38-확장할-수-있는-enumtype이-필요하면-interface를-사용해라)
+- [x] item 39. [명명 패턴보다 Annotation을 사용해라](#item-39-명명-패턴보다-annotation을-사용해라)
+- [x] item 40. [@Override Annotation을 일관되게 사용해라](#item-40-override-annotation을-일관되게-사용해라)
+- [x] item 41. [정의하려는 것이 타입이라면 Marker Interface를 사용해라](#item-41-정의하려는-것이-타입이라면-marker-interface를-사용해라)
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
