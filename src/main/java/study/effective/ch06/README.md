@@ -4,7 +4,7 @@
 
 - [x] item 34. [int 상수 대신 EnumType을 사용해라](#item-34-int-상수-대신-enumtype을-사용해라)
 - [x] item 35. [ordinal 메서드 대신 인스턴스 필드를 사용해라](#item-35-ordinal-메서드-대신-인스턴스-필드를-사용해라)
-- [x] item 36. [비트 필드 대신 EnumSet을 사용해라](#item-36-비트-필드-대신-enumset을-사용해라)
+- [x] item 36. [Bit 필드 대신 EnumSet을 사용해라](#item-36-bit-필드-대신-enumset을-사용해라)
 - [x] item 37. [ordinal 인덱싱 대신 EnumMap을 사용해라](#item-37-ordinal-인덱싱-대신-enummap을-사용해라)
 - [x] item 38. [확장할 수 있는 EnumType이 필요하면 Interface를 사용해라](#item-38-확장할-수-있는-enumtype이-필요하면-interface를-사용해라)
 - [x] item 39. [명명 패턴보다 Annotation을 사용해라](#item-39-명명-패턴보다-annotation을-사용해라)
@@ -195,9 +195,7 @@ public static Operation inverse(Operation op) {
 		SEPTET(7), OCTET(8), DOUBLE_QUARTET(8), NONET(9), DECTET(10), TRIPLE_QUARTET(12);
 
 		private final int numberOfMusicians;
-
 		Esemble(int size) { this.numberOfMusicians = size; }
-
 		public int numberOfMusicians() { return numberOfMusicians; }
 	}
 	```
@@ -211,8 +209,39 @@ __이러한 용도가 아니라면, `ordinal` 메서드는 절대로 사용하�
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
-## item 36. 비트 필드 대신 EnumSet을 사용해라
+## item 36. Bit 필드 대신 EnumSet을 사용해라
+열거한 값들이 집합으로 사용될 경우, 이전에는 비트 필드 열거 상수를 사용했다.
+* __Bit 필드 열거 상수 : 예전 방식__
+	```java
+	public class Text {
+		public static final int STYLE_BOLD          = 1 << 0; // 1
+		public static final int STYLE_ITALIC        = 1 << 1; // 2
+		public static final int STYLE_UNDERLINE     = 1 << 2; // 4
+		public static final int STYLE_STRIKETHROUGH = 1 << 3; // 8
 
+		// 매개변수 syltes는 0개 이상의 STYLE_ 상수를 비트별 OR한 값
+		public void applyStyles(int styles) { ... }
+	}
+	```
+	> `text.applyStyles(STYLE_BOLD | STYLE_UNDERLINE);`
+
+* __`EnumSet` - Bit 필드를 대체하는 최신 방식__
+	```java
+	import java.util.Set;
+	public class NewText {
+		public enum Style { BOLD, ITALIC, UNDERLINE, STRIKETHROUGH }
+		// 어떤 Set을 넘겨도 되나, EnumSet이 가장 좋음
+		public void applyStyles(Set<Style> styles) { ... }    
+	}
+	```
+	> `text.applyStyles(EnumSet.of(Style.BOLD, Style.UNDERLINE));
+`
+	- `EnumSet` 클래스는 열거타입 상수값으로 구성된 집합을 효과적으로 표현
+	- `Set` 인터페이스를 완벽히 구현
+	- 타입 안전
+	- 다른 어떠한 `Set` 구현체와도 함꼐 사용 가능
+
+* __`EnumSet`의 유일한 단점 : 불변 `EnumSet`을 만들 수 없다 (자바 11까지도 미지원)__
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
