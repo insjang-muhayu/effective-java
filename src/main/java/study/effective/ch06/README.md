@@ -12,9 +12,11 @@
 - [x] item 41. [정의하려는 것이 타입이라면 Marker Interface를 사용해라](#item-41-정의하려는-것이-타입이라면-marker-interface를-사용해라)
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 34. int 상수 대신 EnumType을 사용해라
+
+[[TOC]](#목차)
+
 * 필요한 원소를 컴파일타임에 알 수 있는 상수집합이라면 항상 `EnumType`을 사용하자
 * `EnumType`에 정의된 상수개수가 영원히 고정불변일 필요는 없다.
 
@@ -173,9 +175,11 @@ public static Operation inverse(Operation op) {
 ```
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 35. ordinal 메서드 대신 인스턴스 필드를 사용해라
+
+[[TOC]](#목차)
+
 * 대부분의 열거타입 상수는 하나의 정숫값에 대응된다. 
 * 모든 열거타입 상수는 열거타입에서 몇 번째 위치인지를 반환하는 `ordinal` 메서드를 제공
 	> __`ordinal()` 을 잘못 사용하는 경우 : 실용성이 떨어짐__
@@ -207,9 +211,11 @@ __이러한 용도가 아니라면, `ordinal` 메서드는 절대로 사용하�
 
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 36. Bit 필드 대신 EnumSet을 사용해라
+
+[[TOC]](#목차)
+
 열거한 값들이 집합으로 사용될 경우, 이전에는 비트 필드 열거 상수를 사용했다.
 * __Bit 필드 열거 상수 : 예전 방식__
 	```java
@@ -244,9 +250,10 @@ __이러한 용도가 아니라면, `ordinal` 메서드는 절대로 사용하�
 * __`EnumSet`의 유일한 단점 : 불변 `EnumSet`을 만들 수 없다 (자바 11까지도 미지원)__
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 37. ordinal 인덱싱 대신 EnumMap을 사용해라
+
+[[TOC]](#목차)
 
 ```java
 import lombok.RequiredArgsConstructor;
@@ -396,21 +403,75 @@ System.out.println(pMaps);
 
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 38. 확장할 수 있는 EnumType이 필요하면 Interface를 사용해라
 
+[[TOC]](#목차)
 
+### 인터페이스 활용 확장 열거타입을 흉내 낸다.
 ```java
+// 인터페이스 정의
+public interface Oper {
+	double apply(double x, double y);
 
+	@RequiredArgsConstructor
+	public enum BasicOper implements Oper {
+		PLUS("+") { public double apply(double x, double y) { return x + y; } },
+		MINUS("-") { public double apply(double x, double y) { return x - y; } },
+		TIMES("*") { public double apply(double x, double y) { return x * y; } },
+		DIVIDE("/") { public double apply(double x, double y) { return x / y; } };
+
+		private final String symbol;
+
+		@Override public String toString() { return symbol; }
+	}
+}
 ```
 
 ```java
+@RequiredArgsConstructor
+public enum ExtendedOper implements Oper {
+	EXP("^") { 
+		public double apply(double x, double y) { return Math.pow(x, y); } 
+	},
+	REMAINDER("%") { 
+		public double apply(double x, double y) { return x % y; } 
+	};
 
+	private final String symbol;
+
+	@Override public String toString() { return symbol; }
+}
 ```
 
-```java
+### __타입수준에서의 확장된 열거타입__
+* `Class 객체`를 넘기는 방법
 
+* `Collection<? extends Oper>`을 넘기는 방법
+```java
+public class ImplementsEnumTest {
+	@Test
+	void extendedOperTest() {
+		double x = 4.0; double y = 2.0;
+
+		test1(ExtendedOper.class, x, y);
+		test2(Arrays.asList(ExtendedOper.values()), x, y);
+	}
+
+	// `Class 객체`를 넘기는 방법
+	private static <T extends Enum<T> & Oper> void test1(Class<T> opEnumType, double x, double y) {
+		for (Oper op : opEnumType.getEnumConstants()) {
+			System.out.printf("%f %s %f = %f%n", x, op, y, op.apply(x, y));
+		}
+	}
+
+	// `Collection<? extends Oper>`을 넘기는 방법
+	private static void test2(Collection<? extends Oper> opSet, double x, double y) {
+		for (Oper op : opSet) {
+			System.out.printf("%f %s %f = %f%n", x, op, y, op.apply(x, y));
+		}
+	}
+}
 ```
 
 ```java
@@ -424,10 +485,11 @@ System.out.println(pMaps);
 
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 39. 명명 패턴보다 Annotation을 사용해라
 
+[[TOC]](#목차)
+
 
 
 ```java
@@ -451,10 +513,11 @@ System.out.println(pMaps);
 ```
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 40. @Override Annotation을 일관되게 사용해라
 
+[[TOC]](#목차)
+
 
 
 ```java
@@ -478,10 +541,11 @@ System.out.println(pMaps);
 ```
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 41. 정의하려는 것이 타입이라면 Marker Interface를 사용해라
 
+[[TOC]](#목차)
+
 
 
 ```java
@@ -505,6 +569,7 @@ System.out.println(pMaps);
 ```
 
 ---------------------------------------------------------------
+
 [[TOC]](#목차)
 
 

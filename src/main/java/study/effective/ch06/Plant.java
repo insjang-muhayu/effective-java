@@ -1,7 +1,6 @@
 package study.effective.ch06;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
