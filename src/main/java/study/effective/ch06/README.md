@@ -248,11 +248,179 @@ __이러한 용도가 아니라면, `ordinal` 메서드는 절대로 사용하�
 
 ## item 37. ordinal 인덱싱 대신 EnumMap을 사용해라
 
+```java
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public class Plant {
+	enum LifeCycle { ANNUAL, PERENNIAL, BIENNIAL }
+
+	final String name;
+	final LifeCycle lifeCycle;
+
+	@Override public String toString() { return name; }
+
+	public static void main(String[] args) {
+		List<Plant> garden = new ArrayList<>();
+		garden.add(new Plant("호도", LifeCycle.ANNUAL));
+		garden.add(new Plant("땅콩", LifeCycle.ANNUAL));
+		garden.add(new Plant("쌀", LifeCycle.PERENNIAL));
+		// ...
+	}
+}
+```
+
+### __ordinal() 기반 배열 인덱싱 문제점__
+```java
+Set<Plant>[] pSets = (Set<Plant>[]) new Set[Plant.LifeCycle.values().length];
+
+for (int i = 0; i < pSets.length; i++) pSets[i] = new HashSet<>();
+for (Plant p : garden) pSets[p.lifeCycle.ordinal()].add(p);
+
+for (int i = 0; i < pSets.length; i++) 
+	System.out.printf("%s: %s%n", Plant.LifeCycle.values()[i], pSets[i]);
+```
+* 배열은 제네릭과 호환되지 않아 비검사 형변환 오류로 컴파일이 안됨
+	> `@SuppressWarnings("unchecked") Set<Plant>[] pSets = (Set<Plant>[]) new Set[...]`;
+* 배열은 인덱스 의미를 모르니 출력결과에 레이블을 달아야 함
+	> `Plant.LifeCycle.values()[i]`
+* ordinal()은 상수 선언 순서에 따라 변한다.
+* 잘못된 값을 사용하면 이상한 동작을 유발한다.
+	> 운이 좋다면 `ArrayIndexOutOfBoundsException`을 던질 것이다.
+
+### __EnumMap을 사용해 매핑__
+열거타입을 키로 사용하도록 설계된 EnumMap을 사용해 문제점을 해결
+```java
+Map<Plant.LifeCycle, Set<Plant>> pMaps = new EnumMap<>(Plant.LifeCycle.class);
+
+for (Plant.LifeCycle lc : Plant.LifeCycle.values()) pMaps.put(lc, new HashSet<>());
+for (Plant p : garden) pMaps.get(p.lifeCycle).add(p);
+
+System.out.println(pMaps);
+```
+* 타입 안전성 확보, 간단 명료한 코드, 배열과 성능도 비슷
+* `Map` 키를 열거타입의 출력문자열로 제공하므로, 출력결과에 별도의 formatting 불필요
+* 배열 인덱스를 계산하는 과정에서 오류가 날 가능성도 원천봉쇄
+* `EnumMap` 내부에서 `ordinal`을 사용한 배열을 사용하기 때문에 배열과 성능이 비슷
+* 개발자가 직접 제어하지 않고 Map을 사용하여, 타입안정성을 얻을 뿐더러 성능상의 이점까지 그대로 가져간다.
+
+### __Stream을 이용한 코드__
+* __EnumMap 미사용__
+	```java
+	System.out.println(garden.stream().collect(
+		Collectors.groupingBy(p -> p.lifeCycle) // 고유 맵 구현체
+	));
+	```
+	> `EnumMap`이 아닌 `Map` 구현체를 사용했기 때문에 `EnumMap`을 써서 얻은 공간과 성능 이점이 사라지는 문제가 있다.
+* __EnumMap 사용__
+	```java
+	System.out.println(garden.stream().collect(
+		Collectors.groupingBy(
+			p -> p.lifeCycle,
+			() -> new EnumMap<>(LifeCycle.class), // 원하는 맵 구현체 명시
+			Collectors.toSet()
+		)
+	));
+	```
+* `EnumMap` vs `Stream`
+	* `EnumMap`을 이용한 방식 : garden의 모든 키가 생성  
+	* `Stream`을 이용한 방식 : garden의 존재하는 키만 생성
+
+	```java
+	======================== ordinal 기반 배열 인덱싱
+	ANNUAL: [땅콩, 호도]
+	PERENNIAL: [쌀]
+	BIENNIAL: []
+	======================= EnumMap을 사용해 매핑
+	{ANNUAL=[땅콩, 호도], PERENNIAL=[쌀], BIENNIAL=[]}
+	======================= [Stream] EnumMap 미사용
+	{PERENNIAL=[쌀], ANNUAL=[호도, 땅콩]}
+	======================= [Stream] EnumMap 사용
+	{ANNUAL=[땅콩, 호도], PERENNIAL=[쌀]}
+	```
+
+### __중첩 EnumMap__
+
+* EnumMap을 이용
+	```java
+	import lombok.RequiredArgsConstructor;
+
+	public enum Phase {
+		SOLID, LIQUID, GAS;
+
+		@RequiredArgsConstructor
+		public enum Transition {
+			MELT(SOLID, LIQUID), FREEZE(LIQUID, SOLID),
+			BOIL(LIQUID, GAS), CONDENSE(GAS, LIQUID),
+			SUBLIME(SOLID, GAS), DEPOSIT(GAS, SOLID);
+
+			private final Phase from;
+			private final Phase to;
+
+			// 이전상태에서 '이후상태에서 전이로의 맵'에 대응하는 맵
+			private static final Map<Phase, Map<Phase, Transition>> m
+				= Stream.of(values()).collect(Collectors.groupingBy(
+					t -> t.from, 
+					() -> new EnumMap<>(Phase.class), 
+					Collectors.toMap(
+						t -> t.to, // key-mapper
+						t -> t, // value-mapper : 자기자신 참조
+						(x, y) -> y, // merge-function
+						() -> new EnumMap<>(Phase.class) // 내부 Map 선언
+					)
+				));
+
+			public static Transition from(Phase from, Phase to) {
+				return m.get(from).get(to);
+			}
+		}
+	}
+	```
+* 새로운 Phase가 추가되는 경우
+
+	```java
+	public enum Phase {
+		SOLID, LIQUID, GAS, PLASMA; // PLASMA 추가!!!
+
+		@RequiredArgsConstructor
+		public enum Transition {
+			MELT(SOLID, LIQUID), FREEZE(LIQUID, SOLID),
+			BOIL(LIQUID, GAS), CONDENSE(GAS, LIQUID),
+			SUBLIME(SOLID, GAS), DEPOSIT(GAS, SOLID),
+			IONIZE(GAS, PLASMA), DEIONIZE(PLASMA, GAS); // 추가!!!
+
+			// ... 동일 ...
+		}
+	}
+	```
+
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
 ## item 38. 확장할 수 있는 EnumType이 필요하면 Interface를 사용해라
+
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
 
 
 ---------------------------------------------------------------
@@ -261,17 +429,80 @@ __이러한 용도가 아니라면, `ordinal` 메서드는 절대로 사용하�
 ## item 39. 명명 패턴보다 Annotation을 사용해라
 
 
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
 ## item 40. @Override Annotation을 일관되게 사용해라
 
 
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
 ---------------------------------------------------------------
 [[TOC]](#목차)
 
 ## item 41. 정의하려는 것이 타입이라면 Marker Interface를 사용해라
 
+
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
+
+```java
+
+```
 
 ---------------------------------------------------------------
 [[TOC]](#목차)
