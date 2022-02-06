@@ -10,38 +10,43 @@
 
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 10. Overriding equlas
+
+[[TOC]](#목차)
+
 `[재정의]` equals 는 일반 규약을 지켜 재정의하라
-### equals 메서드 재정의
+
+### __equals 메서드 재정의__
+
 * `equals()` 재정의 하지 말아야 할 사항
 	- 각 인스턴스가 본질적으로 고유한 경우
 	- 인스턴스의 `logical equality`를 검사할 경우가 없는 경우
 	- 상위 클래스에서 재정의한 equals()가 하위 클래스에도 적합한 경우
 	- 클래스가 private or package-private이고 equals()를 호출할 일이 없는 경우
 
+### __equals 메서드 규약__
 
-### equals 메서드 규약
 * 반사성 (reflexivity)
-	> null이 아닌 모든 참조값 __X__ 에 대해,  
+	> null이 아닌 모든 참조값 __X__ 에 대해,
 	> `X.equals(X)`는 true
 	- 객체는 자기 자신과 같아야 한다는 뜻
 * 대치성 (symmetry)
-	> null이 아닌 모든 참조값 __X, Y__ 에 대해,  
+	> null이 아닌 모든 참조값 __X, Y__ 에 대해,
 	> `X.equals(Y)`가 true 이면, `Y.equals(X)`도 true
 	- 두 객체는 서로의 동치여부에 대해 똑같은 결과 반환
 
 * 추이성 (transitivity)
-	> null이 아닌 모든 참조값 __X, Y, Z__ 에 대해,  
-	> `X.equals(Y)`가 true 이고 `Y.equals(Z)`가 true 이면,  
+	> null이 아닌 모든 참조값 __X, Y, Z__ 에 대해,
+	> `X.equals(Y)`가 true 이고 `Y.equals(Z)`가 true 이면,
 	> `X.equals(Z)`도 true
 * 일관성 (consistency)
-	> null이 아닌 모든 참조값 __X, Y__ 에 대해,  
+	> null이 아닌 모든 참조값 __X, Y__ 에 대해,
 	> `X.equals(Y)`를 반복 호출하면, 항상 같은 true or false를 반환
 * null 아님
-	> null이 아닌 모든 참조값 __X__ 에 대해,  
+	> null이 아닌 모든 참조값 __X__ 에 대해,
 	> `X.equals(null)`은 false
+
 ```java
 public class ColorPoint {
 	private final Color color;
@@ -54,7 +59,7 @@ public class ColorPoint {
 
 	public Point asPoint() { return point; }
 
-	@Override 
+	@Override
 	public boolean equals(Object o) { // 입력타입은 Object 여야 한다
 		if (!(o instanseof ColorPoint)) return false;
 		ColorPoint obj = (ColorPoint) o;
@@ -64,14 +69,17 @@ public class ColorPoint {
 }
 ```
 
-### equals 구현시 주의사항
+### __equals 구현시 주의사항__
+
 1. `==` 연산자를 사용해 입력이 자신참조인지 확인 (Float, Double은 .compare()로 비교)
 2. `instanceof` 연산자로 입력이 올바른 타입인지 확인
 3. 입력을 올바른 타입으로 형변환
 4. 입력 객체와 자기 자신의 대응되는 '핵심' 필드들이 모두 일치하는지 검사
 
-### @AutoValue
+### __@AutoValue__
+
 __'AutoValue 프레임워크'__ 를 사용하면 `equals`와 `hashCode`를 작성해줌
+
 ```java
 	// build.gradle :
 	//	implementation("com.google.auto.value:auto-value:1.3")
@@ -96,14 +104,18 @@ __'AutoValue 프레임워크'__ 를 사용하면 `equals`와 `hashCode`를 작�
 	}
 ```
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 11. Overriding hashCode
-`[재정의]` equals 를 재정의하려거든 hashCode 도 재정의하라.  
+
+[[TOC]](#목차)
+
+`[재정의]` equals 를 재정의하려거든 hashCode 도 재정의하라.
+
 * `equals`를 재정의한 클래스는 `hashCode`도 재정의 해야 함
 * 미정의 시 HashMap, HashSet에서 원소로 사용하면 문제 발생
 
-### Thread Safe 해시코드
+### __Thread Safe 해시코드__
+
 ```java
 public final class PhoneNumber {
 	private final short areaCode, prefix, lineNum;
@@ -118,7 +130,7 @@ public final class PhoneNumber {
 			// 31 * i == (i << 5) - i
 			result = 31 * result + Short.hashCode(prefix);
 			result = 31 * result + Short.hashCode(lineNum);
-			hashCode = result;			
+			hashCode = result;
 		}
 		return result;
 	}
@@ -126,26 +138,33 @@ public final class PhoneNumber {
 ```
 
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 12. Overriding toString
+
+[[TOC]](#목차)
+
 `[재정의]` toString 을 항상 재정의하라
+
 * 사용성과 디버깅에 필요한 정보 전달을 위해 toString()을 재정의
 * 특별하게 인상적인 내용이 없어 skip...
 
 
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 13. Overriding clone judiciously
+
+[[TOC]](#목차)
+
 `[재정의]` clone 재정의는 주의해서 진행하라
 
-### Cloneable 인터페이스
+### __Cloneable 인터페이스__
+
 ```java
 public interface Cloneable {
 	// 메서드가 하나도 없음
 }
 ```
+
 * Cloneable 은 복제해도 되는 클래스임을 명시하는 용도
 * Cloneable 인터페이스는 Object의 protected 메서드인 __clone()의 동작방식을 결정__
 * `clone()`을 호출하면 그 객체의 필드들을 하나하나 복사한 객체를 반환
@@ -169,7 +188,8 @@ public interface Cloneable {
 	}
 ```
 
-### Deep Copy
+### __Deep Copy__
+
 ```java
 	public class HashTable implements Cloneable {
 		private Entry[] buckets = new Entry[10];
@@ -211,7 +231,8 @@ public interface Cloneable {
 	}
 ```
 
-### 복사생성자 & 복사팩터리 
+### __복사생성자 & 복사팩터리__
+
 ```java
 	// 복사 생성자
 	public Yum(Yum yum) { ... };
@@ -223,11 +244,16 @@ public interface Cloneable {
 * 엉성하게 문서화된 규약에 기대지 않고, 정상적인 final 필드 용법과도 충돌하지 않는다.
 * 불필요한 검사 예외를 던지지 않고, 형변환도 필요치 않는다.
 * __해당 클래스가 구현한 인터페이스 타입의 인스턴스를 인수로 받을 수 있다.__
+
+
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 14. Consider implementing Comparable
+
+[[TOC]](#목차)
+
 `[비교]` Comparable 을 구현할지 고민하라
+
 ```java
 	public interface Comparable<T> {
 		//	자신과 주어진 객체의 순서를 비교
@@ -235,6 +261,7 @@ public interface Cloneable {
 		public int compareTo(T o);
 	}
 ```
+
 알파벳, 숫자, 연대 같이 순서가 명확한 값 클래스를 작성한다면 반드시 `Comparable 인터페이스`를 구현하자.
 
 * `Comparable`은 단순 동치비교와 순서비교를 할 수 있는 Generic 인터페이스
@@ -249,7 +276,8 @@ public interface Cloneable {
 	}
 	```
 
-### __compareTo__ 메서드 일반 규약
+### __compareTo 메서드 일반 규약__
+
 `SGN`은 __signum function__ 을 뜻하고, 값이 음수:-1, 양수:1 을 반환하도록 정의
 
 * `SGN(X.compareTo(Y)) == -SGN(Y.compareTo(X))`
@@ -258,7 +286,8 @@ public interface Cloneable {
 * `(X.compareTo(Y) == 0 ) == (X.equals(Y))`
 	> _이 권고는 필수는 아니지만 꼭 지키는게 좋으며, 만약 지키지 않았다면 이 클래스의 순서는 equals 메서드와 일관되지 않는 다는 것을 명시해야 함_
 
-### 비교자 활용 방식
+### __비교자 활용 방식__
+
 * __정적 compare 메서드__
 	```java
 	static Comparator<Object> hashOrder = new Comparator<>() {
@@ -267,15 +296,19 @@ public interface Cloneable {
 		}
 	}
 	```
+
 * __비교자 생성 메서드__
 	```java
 	static Comparator<Object> hashOrder = Comparator.comparingInt(o->o.hashCode);
 	```
 
-### 정리
+### __정리__
+
 * 순서를 고려하는 값 클래스 작성시 `Comparable` 인터페이스를 구현해 해당 인스턴스를 쉽게 정렬, 검색, 비교할 수 있는 컬렉션과 어우러지도록 해야 한다.
 * `compareTo()`에서 필드 값 비교시 <, > 연산자는 사용하지 말자
 * 박싱된 기본 타입 클래스가 제공하는 정적 `compare()`나 `Compartor` 인터페이스가 제공하는 비교자 생성 메서드를 사용하자.
+
+
 -----------------------------------------------------------------
 [[TOC]](#목차)
 

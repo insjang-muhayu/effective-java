@@ -14,11 +14,16 @@
 - [x] item 24. [멤버 클래스는 되도록 static으로 구현해라](#item-24-멤버-클래스는-되도록-static으로-구현해라)
 - [x] item 25. [톱레벨 클래스는 한 파일에 하나만 생성해라](#item-25-톱레벨-클래스는-한-파일에-하나만-생성해라)
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 15. 클래스와 멤버의 접근을 최소화해라
-: `[캡슐화]` 잘 설계된 컴포넌트는 내부구현을 숨기고, 구현과 API를 깔끔히 분리한다. 다른 컴포넌트와 API를 통해 소통한다.
+
+[[TOC]](#목차)
+
+`[캡슐화]` 잘 설계된 컴포넌트는 내부구현을 숨기고, 구현과 API를 깔끔히 분리한다.
+다른 컴포넌트와 API를 통해 소통한다.
+
 
 ### __캡슐화(정보은닉)의 장점__
 
@@ -29,6 +34,7 @@
 * 개별 컴포넌트 동작 검증을 통해 큰 시스템의 __제작 난이도를 낮춤__
 
 __정보은닉__ 은 접근 `제한자(private, protected, public)`을 제대로 활용하는 것이 핵심
+
 
 ### __접근 제한자 (private, protected, public)__
 
@@ -44,16 +50,19 @@ __정보은닉__ 은 접근 `제한자(private, protected, public)`을 제대로
 	|**package-private**|<b style='color:green'>Y</b>	|<b style='color:green'>Y</b>	|<b style='color:red'>X</b>		|<b style='color:red'>X</b>		|
 	|**private**	|<b style='color:green'>Y</b>	|<b style='color:red'>X</b>		|<b style='color:red'>X</b>		|<b style='color:red'>X</b>		|
 
+
 ### __모듈__
 
 * JAVA 9 부터 모듈 개념이 도입됨
 * __모듈은 패키지들의 묶음__
 * 패키지 중 공개(export)할 것들은 `module-info.java`에 선언
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 16. public 클래스에서는 접근자 메서드를 사용하라
+
+[[TOC]](#목차)
 
 ```java
 	class Point {
@@ -66,6 +75,7 @@ __단점 :__
 * 내부 표현 변경시 API 수정 필요
 * 불변식 보장 불가능
 * 외부에서 필드 접근 시 부수 작업 수행 불가능
+
 
 ### __접근자 방식__
 
@@ -84,6 +94,7 @@ __단점 :__
 	}
 ```
 __public 클래스에서 이 방식은 확실히 맞다.__
+
 
 ### __불변 필드__
 
@@ -111,10 +122,12 @@ __단점 :__
 * 내부 표현 변경시 API 수정 필요
 * 필드를 읽을 때 부수 작업 수행 불가
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 17. 변경 가능성을 최소화해라 (불변 클래스)
+
+[[TOC]](#목차)
 
 ### __불변 클래스(Immutable Class) 란?__
 
@@ -135,11 +148,11 @@ __단점 :__
 ```java
 	public final class Complex { // 불변클래스
 		// 모든 필드는 private final로 선언
-		private final double re; 
+		private final double re;
 		private final double im;
 
 		// private, package-private 생성자
-		private Complex(double re, double im) { 			
+		private Complex(double re, double im) {
 			this.re = re; this.im = im;
 		}
 
@@ -151,7 +164,7 @@ __단점 :__
 	}
 ```
 
-신뢰할 수 없는 하위클래스의 인스턴스인 경우, 
+신뢰할 수 없는 하위클래스의 인스턴스인 경우,
 이 인수들은 가변이라 가정하고 방어적 복사를 사용
 ```java
 	public static BigInteger safeInsatance(BigInteger val) {
@@ -166,17 +179,21 @@ __단점 :__
 * 불변 클래스로 만들기 힘들면 변경할 수 있는 부분은 최대한 줄이자
 * 생성자는 불변식 설정이 모두 완료된 객체를 생성해야한다
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 18. Inheritance보단 Composition을 사용해라
+
+[[TOC]](#목차)
 
 재사용 수단인 `상속`을 잘못 사용하면, `캡슐화`를 깨뜨려 객체 유연성을 해침
 
 ### __Composition (Forwarding 메서드) 사용__
 
-* __`composition`__ : 기존 클래스의 확장 대신에 <u>__`forwarding(전달)`__ 방식을 통해 기능을 확장시킴</u>
-* __`forwarding`__ : 새로운 클래스의 인스턴스 메서드들은 <u>`private 필드`로 참조하는 기존 클래스의 대응하는 메서드(forwarding method)를 호출해 그 결과를 반환</u>
+* __`composition`__ :
+	기존 클래스의 확장 대신에 <u>__`forwarding(전달)`__ 방식을 통해 기능을 확장시킴</u>
+* __`forwarding`__ :
+	새로운 클래스의 인스턴스 메서드들은 <u>`private 필드`로 참조하는 기존 클래스의 대응하는 메서드(forwarding method)를 호출해 그 결과를 반환</u>
 * 기존 클래스의 내부구현방식(메서드 추가와 같은) 영향에서 벗어날 수 있음
 
 ```java
@@ -217,6 +234,7 @@ __단점 :__
 ```
 
 __컴포지션 방식__ 은 어떠한 `Set 구현체`라도 계측할 수 있으며, 기존 생성자들과도 함께 사용 가능
+
 ```java
 	Set<Instant> times = new InstrumentedSet<>(new TreeSet<> cmp); // 래퍼 클래스
 	Set<E> s = new InstrumentedSet<>(new HashSet<>(INIT_CAPACITY));
@@ -226,15 +244,18 @@ __래퍼 클래스(`Wrapper class` == `Decorator pattern`)__ 는 단점이 거�
 
 ### __상속(Inheritance)을 사용할 때__
 
-* 상속은 `Sub Class`가 `Super Class`의 진짜 하위 타입인 상황에서만 사용 
+* 상속은 `Sub Class`가 `Super Class`의 진짜 하위 타입인 상황에서만 사용
 * `(B is A 인 경우)`
 * `Stack`과 `Properties`는 원칙을 위반한 클래스이다
 * 확장하려는 클래스 API의 자체 결함 및 `Sub Class`의 결함 전파 여부 체크해야 함
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 19. 상속을 고려해 설계하고 문서화해라
+
+[[TOC]](#목차)
+
 * __[상속용 클래스]는 재정의(`public`과 `protected` 중 `final`이 아닌) 할 수 있는 메서드를 문서로 남겨야 함__
 	> __`@implSpec` 태그__ : "Implementation Requirements" 메서드의 내부 동작 방식을 설명하는 곳 (java 8부터 사용)
 
@@ -284,7 +305,7 @@ __래퍼 클래스(`Wrapper class` == `Decorator pattern`)__ 는 단점이 거�
 		public final class Sub extends Super {
 			private final Instant instant;
 
-			Sub() { instant = Instant.now(); }			
+			Sub() { instant = Instant.now(); }
 			@Override public void overrideMe() { System.out.println(instant); }
 		}
 	```
@@ -298,17 +319,21 @@ __래퍼 클래스(`Wrapper class` == `Decorator pattern`)__ 는 단점이 거�
 	- __`Final Class`__ 를 선언하는 방법
 	- 생성자를 `private` or `package-private`로 선언하고, __`Public Static Factory`__ 를 만들어주는 방법 ([ITEM-17](#item-17-변경-가능성을-최소화해라-불변-클래스))
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 20. 추상 클래스보다 인터페이스를 우선하라
 
-### 다중 구현 메커니즘 (인터페이스 & 추상클래스)
+[[TOC]](#목차)
+
+### __다중 구현 메커니즘 (인터페이스 & 추상클래스)__
+
 * 추상 클래스의 경우, 추상 클래스에서 정의한 메서드를 구현하는 클래스는 반드시 추상 클래스의 하위 클래스가 되어야 같은 타입으로 취급
 * 인터페이스의 경우, 인터페이스에서 정의한 메서드를 모두 정의한 클래스라면 다른 어떤 클래스를 상속했든 상관없이 같은 타입으로 취급
 
 
-### 인터페이스의 장점
+### __인터페이스의 장점__
+
 * __기존 클래스에 손쉽게 새로운 인터페이스를 구현할 수 있다__
 
 * __인터페이스는 mixin(믹스인) 정의에 안성맞춤이다__
@@ -346,7 +371,7 @@ __래퍼 클래스(`Wrapper class` == `Decorator pattern`)__ 는 단점이 거�
 	```
 * __Wrapper Class와 함께 사용하면, 인터페이스는 기능을 향상시키는 안전하고 강력한 수단이 된다__
 
-### 추상 골격 구현 클래스 (Skeletal Implementation)
+### __추상 골격 구현 클래스 (Skeletal Implementation)__
 
 인터페이스와 추상 골격 구현(Skeletal Implementation) 클래스를 함께 제공하는 방법
 * 인터페이스로는 타입을 정의
@@ -355,13 +380,13 @@ __래퍼 클래스(`Wrapper class` == `Decorator pattern`)__ 는 단점이 거�
 ```java
 public class IntArrays {
 	// public interface List<E> extends Collection<E> { ... }
-	
+
 	static List<Integer> intArrayAsList(int[] a) {
 		Objects.requireNonNull(a);
-		
-		// public abstract class AbstractList<E> 
+
+		// public abstract class AbstractList<E>
 		//     extends AbstractCollection<E> implements List<E> { ... }
-		
+
 		// 추상 골격 구현 클래스를 구현해 반환
 		return new AbstractList<Integer>() { // 익명 클래스 형태
 			// AbstractList의 Abstract Method (반드시 구현)
@@ -379,7 +404,7 @@ public class IntArrays {
 }
 ```
 
-###  골격 구현 작성 방법
+### __골격 구현 작성 방법__
 
 __골격구현 클래스는 추상 클래스처럼 구현을 도와주는 동시에 추상 클래스로 타입을 정의할 때 따라오는 제약에서 자유롭다__
 
@@ -387,7 +412,8 @@ __골격구현 클래스는 추상 클래스처럼 구현을 도와주는 동시
 2. 기반 메서드들을 사용해 직접 구현할 수 있는 메서드를 모두 디폴트 메서드로 제공
 	> 단 `equals()`, `hashCode()`는 제공하면 안된다.
 3. 기반 메서드나 디폴트 메서드로 만들지 못한 메서드가 남아 있다면, 인터페이스를 구현하는 골격 구현 클래스를 만들어 남은 메서드를 작성
-5. 골격 구현은 기본적으로 상속이므로, 설계 및 문서화 지침을 따라야 한다.
+4. 골격 구현은 기본적으로 상속이므로, 설계 및 문서화 지침을 따라야 한다.
+
 
 ```java
 // Map.Entry 인터페이스나 그 하위 인터페이스로는 이 골격구현 제공 불가능
@@ -416,7 +442,7 @@ public abstract class AbstractMapEntry<K,V> implements Map.Entry<K,V> {
 }
 ```
 
-### 단순 구현(Simple Implementation)
+### __단순 구현(Simple Implementation)__
 
 * 골격구현의 작은 변종 (골격구현과 유사점)
 	> 상속을 위해 인터페이스를 구현
@@ -462,7 +488,8 @@ public abstract class AbstractMapEntry<K,V> implements Map.Entry<K,V> {
 	}
 	```
 
-### 템플릿 메서드 패턴
+### __템플릿 메서드 패턴__
+
 ```java
 	public abstract class Super {
 		public void templateMethod() { // 기본 알고리즘 코드
@@ -481,12 +508,14 @@ public abstract class AbstractMapEntry<K,V> implements Map.Entry<K,V> {
 
 ```
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 21. 인터페이스는 구현하는 쪽을 생각해 설계해라
-생각할 수 있는 모든 상황에서 불변식을 해치지 않는 디폴트 메서드를 작성하기는 어렵다.
 
+[[TOC]](#목차)
+
+생각할 수 있는 모든 상황에서 불변식을 해치지 않는 디폴트 메서드를 작성하기는 어렵다.
 
 ```java
 	/**
@@ -512,7 +541,9 @@ public abstract class AbstractMapEntry<K,V> implements Map.Entry<K,V> {
 		return removed;
 	}
 ```
-### 예기치 못한 상황
+
+### __예기치 못한 상황__
+
 __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 ```java
 	public boolean removeIf(Predicate<? super E> filter) {
@@ -521,18 +552,23 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 		}
 	}
 ```
+
 * 여러 스레드가 공유하는 환경에서 removeIf를 호출하면 ConcurrentModificationException이 발생하거나 다른 예상치 못한 결과로 이어질 수 있다.
 * 디폴트 메서드는 컴파일에 성공하더라도 기존 구현체에 런타임 오류를 일으킬 수 있다.
-* 디폴트 메서드가 생겼더라도, 인터페이스 설계할 때는 여전히 주의를 기울여야한다. 
+* 디폴트 메서드가 생겼더라도, 인터페이스 설계할 때는 여전히 주의를 기울여야한다.
 * 인터페이스를 릴리즈한 후라도 결함을 수정하는 것이 가능할 수는 있지만, 절대 그 가능성에 기대서는 안된다.
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 22. 인터페이스는 타입을 정의하는 용도로만 사용해라
+
+[[TOC]](#목차)
+
 `인터페이스는 타입`을 정의하는 용도로만 사용해야하며, `상수 공개용 수단`으로 사용하면 안됨
 
 ### __상수 공개용으로 적합한 수단__
+
 * __`Enum 타입`으로 공개__
 	```java
 	public enum Day{ MON, TUE, WED, THU, FRI, SAT, SUN};
@@ -550,16 +586,18 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 23. 태그 달린 클래스보다 클래스 계층구조를 활용해라
 
+[[TOC]](#목차)
+
 ### __태그 달린 클래스 문제점__
 > 태그 달린 클래스는 장황하며, 오류를 내기 쉽고 비효율적
+
 ```java
 	class Figure {
 		enum Shape { CIRCLE, RECTANGLE };
-		final Shape shape; // 태그 필드 
+		final Shape shape; // 태그 필드
 
 		double radius; // CIRCLE 일때만 사용
 		double length; double width; // RECTANGLE 일때만 사용
@@ -583,6 +621,7 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 		}
 	}
 ```
+
 * 열거타입 선언, 태그 필드, `switch`문 등 쓸데없는 코드가 많음 (장황)
 * 여러 구현이 한 클래스에 혼합되어 __가독성이 나쁨__
 * 다른 의미를 위한 코드도 있어, 메모리를 많이 사용
@@ -591,16 +630,18 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 * 인스턴스 타입만으로 현재 나타내는 의미를 알 길이 없음
 
 ### __클래스 계층구조__
+
 #### __[구현방법]__
 1. 계층구조의 루트가 될 __추상클래스 정의__, 태그값에 따라 다른 동작 메서드들은 __추상메서드로 선언__
 2. 태그 값에 상관없이 동작이 일정한 메서드들은 __일반메서드로 추가__
 3. 모든 하위클래스에서 공통으로 사용하는 데이터필드도 루트클래스에 추가
 4. 루트클래스를 확장한 구체클래스를 의미별로 정의, 각 하위클래스에 각자 의미에 해당하는 데이터필드 추가
 5. 루트클래스가 정의한 추상메서드를 하위클래스에서 각자 의미에 맞게 구현
+
 ```java
 	abstract class Figure { // 1. 추상클래스 정의
 		// 1. 추상메서드 선언 (태그에 따라 다른 동작)
-		abstract double area(); 
+		abstract double area();
 	}
 
 	class Circle extends Figure {
@@ -623,39 +664,43 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 		@Override double area() { return length * width; }
 	}
 ```
+
 #### __[장점]__
 * 태그 달린 클래스의 단점을 모두 해소
 * 타입 사이의 자연스러운 계층관계를 반영하여 유연성 증대
 * 컴파일타임에 타입 검사 능력 향상
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 24. 멤버 클래스는 되도록 static으로 구현해라
 
-### 중첩 클래스 (Nested Class)
-> 다른 클래스 안에 정의된 클래스를 말한다. __중첩클래스__ 는 자신을 감싼 바깥 클래스에서만 사용돼야 하며, 그 외의 쓰임새가 있다면 __톱레벨클래스__ 로 만들어야한다.
+[[TOC]](#목차)
+
+### __중첩 클래스 (Nested Class)__
+> 다른 클래스 안에 정의된 클래스를 말한다.
+> __중첩클래스__ 는 자신을 감싼 바깥 클래스에서만 사용돼야 하며,
+> 그 외의 쓰임새가 있다면 __톱레벨클래스__ 로 만들어야한다.
 
 #### __[정적 멤버 클래스]__
-* 흔히 바깥 클래스와 함께 쓰이는 public 도우미 클래스로 쓰인다. 
+* 흔히 바깥 클래스와 함께 쓰이는 public 도우미 클래스로 쓰인다.
 * 바깥 인스턴스와 독립적으로 인스턴스가 존재한다.
 * `private` 정적멤버클래스는 흔히 바깥 클래스가 표현하는 객체의 한 부분을 나타낼 때 사용한다.
 	```java
-	public class Caculator { 
-		// 열거타입도 정적멤버클래스 
+	public class Caculator {
+		// 열거타입도 정적멤버클래스
 		public enum Operation { PLUS, MINUS }
 	}
 
 	public class Caculator {
 		// 정적멤버클래스
-		public static class Operation { } 
+		public static class Operation { }
 	}
 	```
 
 
 #### __[(비정적) 멤버 클래스]__
-
-> 비정적멤버클래스의 인스턴스 안에 만들어져 메모리를 차지하며, 생성시간도 더 걸린다.   
+> 비정적멤버클래스의 인스턴스 안에 만들어져 메모리를 차지하며, 생성시간도 더 걸린다.
 > 멤버클래스에서 바깥인스턴스에 접근할 일이 없다면 무조건 `static`을 붙여서 __정적멤버클래스__ 로 만들자.
 
 * 사용
@@ -665,6 +710,7 @@ __`org.apache.commons.collections4.collection.SynchronizedCollection`__
 	- Set과 List 같은 다른 컬렉션 인터페이스 구현들도 자신의 반복자를 구현할 때 비정적 멤버 클래스를 주로 사용
 
 * 비정적멤버클래스는 바깥인스턴스 없이 생성 불가
+
 ```java
 public class NestedNonStaticExam {
 	private final String name;
@@ -678,7 +724,7 @@ public class NestedNonStaticExam {
 	private class NonStaticClass { // 비정적멤버클래스
 		private final String nonStaticName;
 		public NonStaticClass(String name) { this.nonStaticName = name; }
-		
+
 		public String getNameWithOuter() { // 바깥클래스.this를 통해 메서드 사용가능
 			return nonStaticName + NestedNonStaticExam.this.getName();
 		}
@@ -699,7 +745,7 @@ public class NestedNonStaticExam {
 	- 클라이언트는 익명 클래스가 상위 타입에서 상속한 멤버 외에는 호출 불가능
 	- 표현식 중간에 있어, 코드가 긴 경우 가독성이 떨어진다.
 
-> 람다(자바7)등장 이전에는 작은 함수객체나 처리객체 구현에 사용되었으며,  
+> 람다(자바7)등장 이전에는 작은 함수객체나 처리객체 구현에 사용되었으며,
 > __정적팩터리메서드__ 구현시 사용되기도 함
 
 ```java
@@ -725,10 +771,9 @@ interface Operator {
 }
 ```
 
-
 #### __[지역 클래스]__
 > 중첩 클래스 중 가장 드물게 사용된다.
-* 지역클래스는 지역변수를 선언할 수 있는 곳이면 어디서든 선언 가능 
+* 지역클래스는 지역변수를 선언할 수 있는 곳이면 어디서든 선언 가능
 * 유효범위는 지역변수와 동일
 * 멤버클래스 처럼 이름이 있으며, 반복해서 사용 가능
 * 익명클래스처럼 비정적문맥에서 사용될 떄만 바깥인스턴스 참조 가능
@@ -739,7 +784,7 @@ public class LocalExam {
 	private int number;
 	public LocalExam(int number) { this.number = number; }
 
-	public void foo() {			
+	public void foo() {
 		class LocalClass { // 지역변수처럼 선언해서 사용
 			private String name;
 			public LocalClass(String name) { this.name = name; }
@@ -755,10 +800,13 @@ public class LocalExam {
 }
 ```
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 25. 톱레벨 클래스는 한 파일에 하나만 생성해라
+
+[[TOC]](#목차)
+
 * __소스 파일 하나에는 반드시 톱레벨 클래스를 하나만 담자.__
 * 여러 톱레벨 클래스를 한 파일에 담고 싶다면, __정적멤버클래스__ 를 사용하는 방법을 고민해볼 수 있다.
 	```java

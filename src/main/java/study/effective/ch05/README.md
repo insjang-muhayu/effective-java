@@ -12,7 +12,6 @@
 - [x] item 33. [타입 안전 이종 컨테이너를 고려해라](#item-33-타입-안전-이종-컨테이너를-고려해라)
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 
 
@@ -30,7 +29,9 @@
 | 제네릭 메서드            | Generic method          | `static <E> List<E> asList(E[] a)` |
 | 타입 토큰                | type token              | `String.class`                     |
 
-## __item 26. Raw type은 사용하지 마라__
+## item 26. Raw type은 사용하지 마라
+
+[[TOC]](#목차)
 
 ### __ClassCastException 경고 발생__
 
@@ -45,7 +46,7 @@
 		}
 		public static void main(String[] args) {
 			// Stamp 인스턴스만 취급 (Raw Type 선언)
-			Collection stamps = new ArrayList(); 
+			Collection stamps = new ArrayList();
 			// 실수로 Coin 추가
 			stamps.add(new Stamp()); stamps.add(new Coin());
 			// 조회시 ClassCastException 발생
@@ -71,7 +72,7 @@
 		}
 	}
 	```
-	> Exception in thread "main" java.lang.ClassCastException :  
+	> Exception in thread "main" java.lang.ClassCastException :
 	> ... class java.lang.Integer cannot be cast to class java.lang.String
 
 * __Generic parameter type : compile 오류__
@@ -119,9 +120,9 @@
 	- `List.class`, `String[].class`, `int.class` 는 허용하지만, `List<String>.class`, `List<?>.class` 는 허용하지 않는다.
 
 * __instanceof 연산__
-	- 런타임에는 제네릭 타입 정보가 지워지므로 `instanceof` 연산자는  
-	  `Unbounded wildcard type` 이외의 매개변수화 타입에는 적용할 수 있다. 
-	- `Raw type`과 `Unbounded wildcard type` 이 완전히 동일하게 동작한다. 
+	- 런타임에는 제네릭 타입 정보가 지워지므로 `instanceof` 연산자는
+	  `Unbounded wildcard type` 이외의 매개변수화 타입에는 적용할 수 있다.
+	- `Raw type`과 `Unbounded wildcard type` 이 완전히 동일하게 동작한다.
 	- 그러므로 `Raw type`을 쓰는 편이 더 깔끔하다.
 
 	```java
@@ -132,28 +133,31 @@
 
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 27. Unchecked Warning을 제거해라
+
+[[TOC]](#목차)
 
 할 수 있는 한 모든 Unchecked Warning을 제거하라
 ```java
 	// Warning!! : unchecked conversion
-	Set<Lark> set = new HashSet(); 
+	Set<Lark> set = new HashSet();
 
 	// (자바7부터 지원) 다아아몬드 연산자(<>)로 해결
-	Set<Lark> set = new HashSet<>(); 
+	Set<Lark> set = new HashSet<>();
 ```
 
 ### __@SuppressWarnings("unchecked")__
+
 * 타입이 안전하다고 판단되면 Annotation을 활용해 경고를 숨김
 * `@SuppressWarnings`은 가능한 좁은 범위에 적용하라
 * `@SuppressWarnings("unchecked")` 사용시 경고를 무시해도 되는 사유를 주석 작성
+
 ```java
 	public <T> T[] toArray(T[] a) {
 		if (a.length < size) {
 			// 생성배열과 매개변수로 받은 배열타입이 T[]와 같으므로 바른 형변환
-			@SuppressWarnings("unchecked") T[] result = 
+			@SuppressWarnings("unchecked") T[] result =
 				(T[]) Arrays.copyOf(elements, size, a.getClass());
 			return result;
 		}
@@ -164,10 +168,12 @@
 	}
 ```
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 28. Array보다는 List를 사용해라
+
+[[TOC]](#목차)
 
 ### __Array(Covariant)와 List(Invariant) 차이__
 
@@ -192,7 +198,7 @@
 				List<String> list = new ArrayList<>();
 				list.add("Gyunny");
 				test(list);   // 컴파일 에러
-			} 
+			}
 		}
 	```
 	- `List(불공변)`는 컴파일 오류 발생
@@ -325,15 +331,17 @@
 	- `Array` 대신 `List`를 사용하여, 형변환 경고를 제거 가능
 	- __Runtime__ 시에 `ClassCastException`이 발생할 일도 없음
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 29. 이왕이면 Generic Type으로 만들어라
+
+[[TOC]](#목차)
 
 ### __[배열을 사용한 코드를 제네릭으로 만드는 방법]__
 
 * __방법1. 제네릭 배열 생성 금지 제약 우회__
-	- `@SuppressWarnings("unchecked")` 을 추가하여, 경고문구가 발생을 숨김 
+	- `@SuppressWarnings("unchecked")` 을 추가하여, 경고문구가 발생을 숨김
 	- 명시적으로 형변환을 하지 않고도 `ClassCastException` 을 걱정없이 사용 가능
 
 * __방법2. Object[]로 타입 변경__
@@ -349,12 +357,12 @@
 
 		@SuppressWarnings("unchecked") // [방법1] 어노테이션 추가 !!!
 		public Stack() {
-			// elems = new E[INIT_CAPACITY]; // Unchecked cast: 'Object[]' to 'E[]' 
+			// elems = new E[INIT_CAPACITY]; // Unchecked cast: 'Object[]' to 'E[]'
 			elems = (E[]) new E[INIT_CAPACITY]; // [방법1]
 		}
 
 		public void push(E e) {
-			ensureCapacity(); 
+			ensureCapacity();
 			elems[size++] = e;
 		}
 
@@ -377,8 +385,8 @@
 
 ### __[제네릭 Stack을 사용하는 맛보기 프로그램]__
 
-> 대부분 제네릭타입은 타입매개변수에 아무런 제약을 두지 않으며,  
-> `Stack<Object>, Stack<int[]>, Stack<List<String>>` 등 어떤 참조타입으로도 생성 가능   
+> 대부분 제네릭타입은 타입매개변수에 아무런 제약을 두지 않으며,
+> `Stack<Object>, Stack<int[]>, Stack<List<String>>` 등 어떤 참조타입으로도 생성 가능
 > __(단, 기본타입(`Stack<int>, Stack<double>`)은 사용할 수 없다)__
 
 ```java
@@ -395,10 +403,12 @@
 	public class DelayQueue<E extends Delayed> implements BlockingQueue<E>
 ```
 
+
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 30. 이왕이면 Generic Method로 만들어라
+
+[[TOC]](#목차)
 
 ### __제네릭 메서드__
 > __제네릭 메서드__ 로 바꿔주면 경고문구가 뜨지 않으며, 타입안전성도 지켜지는 것을 확인 가능
@@ -422,7 +432,7 @@ __[제네릭 메서드를 활용하는 간단한 프로그램]__
 ```
 
 ### __제네릭 싱글턴 팩터리__
-> 때때로 불변객체를 여러 타입으로 활용할 수 있게 만들어야 하는 경우가 있다.   
+> 때때로 불변객체를 여러 타입으로 활용할 수 있게 만들어야 하는 경우가 있다.
 > 요청한 타입매개변수에 맞게 매번 그 객체타입을 바꿔주는 __제네릭 싱글턴 팩터리__ 를 이용해 구현 가능
 
 ```java
@@ -453,20 +463,28 @@ __[제네릭 메서드를 활용하는 간단한 프로그램]__
 
 
 ### __재귀적 타입 한정 (Recursive Type Bound)__
-자기 자신이 들어간 표현식을 사용하여, 타입 매개변수의 허용범위를 한정하는 `Recursive Type Bound` 개념이 있다. `Recursive Type Bound`은 주로 타입의 순서를 정하는 `Comparable` 과 함께 사용한다.
+
+자기 자신이 들어간 표현식을 사용하여,
+타입 매개변수의 허용범위를 한정하는 `Recursive Type Bound` 개념이 있다.
+`Recursive Type Bound`은 주로 타입의 순서를 정하는 `Comparable` 과 함께 사용한다.
+
 ```java
 public interface Comparable<T> {
 	public int compareTo(T o);
 }
 ```
-타입한정인 `<E extends Comparable<E>>`는 "모든 타입 E는 자신과 비교할 수 있다"라는 의미로 해석할 수 있으며, 상호 비교가 가능하다는 것을 의미
+
+타입한정인 `<E extends Comparable<E>>`는
+"모든 타입 E는 자신과 비교할 수 있다"라는 의미로 해석할 수 있으며,
+상호 비교가 가능하다는 것을 의미
+
 ```java
 public static <E extends Comparable<E>> E max(Collection<E> c) {
 	if (c.isEmpty()) throw new IllegalArgumentException("collection is empty");
 
 	E result = null;
 	for (E e : c) {
-		if (result == null || e.compareTo(result) > 0) 
+		if (result == null || e.compareTo(result) > 0)
 			result = Objects.requireNonNull(e);
 	}
 	return result;
@@ -475,12 +493,15 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 31. 한정적 와일드카드를 사용해 API 유연성을 높여라
 
+[[TOC]](#목차)
+
 ### __경계 와일드카드 (Bounded Wildcard)__
+
 경계 와일드카드(`Bounded Wildcard`)를 이용해서 해결 예시
+
 ```java
 //	public void pushAll(Iterable<E> src) { // [e1] compile error
 //		==> upper bounded wildcard 로 해결
@@ -490,7 +511,7 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 
 //	public void popAll(Collection<E> dst) { // [e2]
 //		==> lower bounded wildcard 로 해결
-	public void popAll(Collection<? super E> dst) { 
+	public void popAll(Collection<? super E> dst) {
 		while (!isEmpty()) dst.add(pop());
 	}
 
@@ -499,20 +520,22 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 
 		Iterable<Integer> integers = ...;
 		// [e1] : (Iterable<Number> != Iterable<Integer>) compile error
-		stack.pushAll(integers); 
+		stack.pushAll(integers);
 
 		Collection<Object> objects = ...;
 		// [e2] : (Collection<Object> != Collection<Number>) compile error
-		stack.popAll(objects); 
+		stack.popAll(objects);
 	}
 ```
 
 ### __PECS__
+
 어떤 와일드 카드를 사용해야 하는지 기억하는데 있어서 `PECS` 공식 활용
 
 * __PECS : producer - extends, consumer - super__
 * T가 생산자이면 상한경계와일드카드(`<? extends E>`)를 사용
 * T가 소비자이면 하한경계와일드카드(`<? super E>`)를 사용
+
 ```java
 //	public static <E extends Comparable<E>> E max(List<E> c) {
 	public static <E extends Comparable<? super E>> E max(List<? extends E> c) {
@@ -520,20 +543,23 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 
 		E result = null;
 		for (E e : c) {
-			if (result == null || e.compareTo(result) > 0) 
+			if (result == null || e.compareTo(result) > 0)
 				result = Objects.requireNonNull(e);
 		}
 
 		return result;
 	}
 ```
+
 + __`List<E>` :--> `List<? extends E>`__ : 입력매개변수는 `E`인스턴스를 생성
 * __`Comparable<E>` :--> `Comparable<? super E>`__ : `Comparable`은 언제나 소비자 역할
 * `Comparable`와 `Comparator`는 모두 소비자이다.
 * 메서드선언에 타입 매개변수가 한번만 나오면 wildcard로 대체하는 것이 좋다.
 
 ### __private static helper 메서드__
+
 컴파일러는 변수에 잘못된 타입의 값을 할당하고 있다고 믿는다는 것을 의미
+
 ```java
 	public static void swap(List<?> list, int i, int j) {
 	//	list.set(i, list.set(j, list.get(i)));
@@ -547,13 +573,15 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 32. 제네릭과 가변인수를 함께 쓸 때는 신중해라
 
-### @SafeVarargs
-* 제네릭 가변인수 메서드의 타입 안전이 확실히 보장될 때는  
-	Java 7부터 @SafeVarargs 어노테이션으로 경고문구를 숨길 수 있다. 
+[[TOC]](#목차)
+
+### __@SafeVarargs__
+
+* 제네릭 가변인수 메서드의 타입 안전이 확실히 보장될 때는
+	Java 7부터 @SafeVarargs 어노테이션으로 경고문구를 숨길 수 있다.
 * 메서드가 안전한 경우 :
 	- varargs 매개변수 배열에 아무것도 저장하지 않는다.
 	- 배열 혹은 복제본을 신뢰할 수 없는 코드에 노출하지 않는다.
@@ -566,12 +594,13 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 		return result;
 	}
 	```
-### List.of
+### __List.of__
+
 * 정적 팩터리 메서드인 List.of를 활용해 메서드에 임의의 인수를 넘길 수 있다. (List.of 에 @SafeVarargs가 있기때문에 가능)
-* __장점__ 은 컴파일러가 메서드 타입 안정성을 검증할 수 있는데 있다.  
-	프로그래머가 @SafeVarargs 어노테이션을 달지 않아도 되며,  
-	실수로 안전하다고 판단할 걱정도 없다. 
-* __단점__ 은 클라이언트 코드가 살짝 지저분해지고,  
+* __장점__ 은 컴파일러가 메서드 타입 안정성을 검증할 수 있는데 있다.
+	프로그래머가 @SafeVarargs 어노테이션을 달지 않아도 되며,
+	실수로 안전하다고 판단할 걱정도 없다.
+* __단점__ 은 클라이언트 코드가 살짝 지저분해지고,
 	속도가 약간 느려질 수 있다는 점이다.
 	```java
 	public class VarargsTest {
@@ -594,11 +623,12 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 33. 타입 안전 이종 컨테이너를 고려해라
 
-### 타입안전이종컨테이너 (type safe heterogeneous container)
+[[TOC]](#목차)
+
+### __타입안전이종컨테이너 (type safe heterogeneous container)__
 
 * 패턴 (pattern)
 	* 컨테이너 대신 키를 타입 매개변수화 한다.
@@ -609,6 +639,7 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
 		> `cast() ` 활용해 해결  : `public class Class<T> { T cast(Object obj); }`
 	* 실체화불가타입(`List<String>, List<Integer>`)에는 사용 불가
 		> `List<String>, List<Integer>` 는 Class 객체를 얻을 수 없음 (둘다 List.class 를 공유)
+
 ```java
 import java.util.HashMap;
 import java.util.Map;
@@ -637,13 +668,14 @@ public class Favorites {
 		int favInt = f.getFavorite(Integer.class);
 		Class<?> favCls = f.getFavorite(Class.class);
 
-		System.out.printf("%s %x %s%n", favStr, favInt, favCls.getName()); 
+		System.out.printf("%s %x %s%n", favStr, favInt, favCls.getName());
 		// 출력 : Java cafebabe Favorites
 	}
 }
 ```
 
-### 한정적 타입 토큰
+### __한정적 타입 토큰__
+
 * 만약 타입을 제한하고 싶다면 __한정적 타입 토큰__ 을 활용하면 된다.
 * __한정적 타입 토큰__ : "한정적 타입 매개변수"나 "한정적 와일드카드"를 사용하여 표현가능한 타입을 제한하는 타입토큰
 * annotationType 인수는 애터테이션 타입을 뜻하는 한정적 타입 토큰이다.
@@ -652,9 +684,8 @@ public class Favorites {
 	public <T extends Annotation> T getAnnotation(Class<T> annotationType);
 	```
 * 어노테이션 요소는 그 키가 어노테이션 타입인, 타입안전이종컨테이너이다.
-* `Class<?>` 타입의 객체를 한정적 타입 토큰을 받는 메서드에 넘기고 싶을 때 `asSubclass()` 활용  
+* `Class<?>` 타입의 객체를 한정적 타입 토큰을 받는 메서드에 넘기고 싶을 때 `asSubclass()` 활용
 	> `asSubclass() 메서드`: 호출된 인스턴스 자신의 Class 객체를 인수가 명시한 클래스로 형변환
-
 	```java
 	static Annotation getAnnotation(AnnotatedElement element, String annotationTypeName) {
 		Class<?> annotationType = null; //비한정적 타입 토큰

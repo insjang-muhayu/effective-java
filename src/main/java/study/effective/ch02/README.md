@@ -13,11 +13,15 @@
 - [x] item 09. [try-with-resources](#item-09-try-with-resources)
 
 ---------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 01. Static Factory Method
+
+[[TOC]](#목차)
+
 `[객체생성]`
-### Static Factory Method 특징
+
+### __Static Factory Method 특징__
+
 1. __객체의 특성에 적합한 명명 가능__
 	* `BigInteger(int, int, Random)` -> `BigInteger.probablePrime`
 2. __인스턴스를 새로 생성하지 않아도 됨__
@@ -38,7 +42,9 @@
 	* 단점 :
 		* 하위 클래스 생성 불가
 		* API 설명 힌트 지원 안됨 (주석 잘 달아야 함)
-### Naming Convention
+
+### __Naming Convention__
+
 * **from** :
 	> `Date dt = Date.from(instant);`
 * **of** :
@@ -56,12 +62,17 @@
 * **{Type}** :
 	> `List<Complaint> litany = Collectins.list(legacyLitany);`
 
+
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 02. Builder
+
+[[TOC]](#목차)
+
 `[객체생성]`
-### 점층적 생성자 패턴 (Telescoping Constructor Pattern)
+
+### __점층적 생성자 패턴 (Telescoping Constructor Pattern)__
+
 * 매개변수의 개수/타입로 생성자를 구분하는 방식
 * 생성자에 필요한 매개변수가 단순할 때 사용 (가장 기초적 생성자 패턴)
 	```java
@@ -79,7 +90,8 @@
 	}
 	```
 
-### 자바빈즈 패턴 (JavaBeans Pattern)
+### __자바빈즈 패턴 (JavaBeans Pattern)__
+
 * MVC의 Model 클래스와 비슷 (Setter/Getter 함수로 이루어짐)
 * 장점 : `점층적 생성자 패턴`에 비해 매개변수 의미 부여 가능
 * 단점 :
@@ -109,7 +121,8 @@
 		A.setName("muhayu"); // 예외발생!!
 		```
 
-### 빌더 패턴 (Builder Pattern)
+### __빌더 패턴 (Builder Pattern)__
+
 * 안전성과 가독성 겸비
 * Builder는 일반적으로 _Static Member Class_ 로 생성
 * `Method Chaining` 혹은 `Fluent API` 형으로 사용 가능
@@ -201,24 +214,31 @@
 			.build();
 		```
 
+
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 03. Singleton
+
+[[TOC]](#목차)
+
 `[객체생성]`
 `singleton` : 인스턴스를 오직 하나만 생성할 수 있는 클래스
-### [ Public Static Final 필드 방식 ]
+
+### __[ Public Static Final 필드 방식 ]__
+
 ```java
 	public class Elvis {
 		public static final Elvis INSTANCE = new Elvis();
 		private Elvis() { ... }
 	}
 ```
+
 * 클래스가 싱글턴임이 API에서 명백히 드러남
 * `final`이므로 다른 객체 참조 불가
 * **간결함.. !!**
 
-### [ Static Factory 방식 ]
+### __[ Static Factory 방식 ]__
+
 ```java
 	public class Elvis {
 		private static final Elvis INSTANCE = new Elvis();
@@ -230,7 +250,8 @@
 * 정적팩터리의 '메서드 참조'를 Supplier로 사용 가능
 * ___위 두가지 장점이 불필요하면, `public static final` 방식이 더 좋음___
 
-### [ Reflection 방어 ]
+### __[ Reflection 방어 ]__
+
 ```java
 	public class Elvis {
 		public static final Elvis INSTANCE = new Elvis();
@@ -241,7 +262,8 @@
 	}
 ```
 
-### [ Singleton Class 직렬화 ] : implements Serializable
+### __[ Singleton Class 직렬화 ] : implements Serializable__
+
 ```java
 	public class Elvis implements Serializable {
 		private static final Elvis INSTANCE = new Elvis();
@@ -255,7 +277,8 @@
 ```
 * 역직렬화 시, 새로운 인스턴스 생성을 방지하기 위해 readResolve() 를 제공해야함
 
-### [ Enum 방식 ] : 싱글턴 끝판왕!!
+### __[ Enum 방식 ] : 싱글턴 끝판왕!!__
+
 ```java
 	public enum Elvis {
 		INSTANCE;
@@ -269,11 +292,13 @@
 
 
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 04. Private Constructor
+
+[[TOC]](#목차)
+
 `[객체생성]` : ( [StockUtils.java : StockUtils()](./StockUtils.java) )
-* `java.util.Arrays` or `java.lang.Math` 처럼 Static Method외 Static Field 를 모아둔 Utitlity Class를 만들 경우,<br>
+* `java.util.Arrays` or `java.lang.Math` 처럼 Static Method외 Static Field 를 모아둔 Utitlity Class를 만들 경우,
    비어있는 `private형 생성자`를 만들어서 인스턴스 화를 방지해야 한다. _(컴파일러에서 자동으로 public 생성자를 생성하기 때문)_
 * `final class`를 상속해서 하위 클래스에 메서드를 넣는 것은 불가능하므로, final 클래스와 관련 메서드들을 모아놓을때도 사용
 
@@ -285,7 +310,8 @@
 	}
 ```
 
-### java.util.Arrays
+### __java.util.Arrays__
+
 ```java
 	public class Arrays {
 		private static final int MIN_ARRAY_SORT_GRAN = 1 << 13;
@@ -298,10 +324,13 @@
 	}
 ```
 
+
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 05. Dependency Injection
+
+[[TOC]](#목차)
+
 `[객체생성]`
 
 * 여러 자원에 의존적인 클래스의 경우는 `Static Utility Class` or `Singleton` 방식은 부적합
@@ -322,7 +351,7 @@
 	}
 ```
 
-### Factory : Supplier\<T\> 인터페이스
+### __Factory : Supplier\<T\> 인터페이스__
 
 ```java
 	@FunctionalInterface
@@ -334,12 +363,17 @@
 	Mosaic create(Supplier<? extends Tile> tileFactory) { ... }
 ```
 
+
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 06. Avoid Unnecessary Object
+
+[[TOC]](#목차)
+
 `[객체생성]`
-### 불필요한 객체 생성을 피해 __성능 개선__
+
+### __불필요한 객체 생성을 피해 성능 개선__
+
 ```java
 	// 나쁜 예 - 호출마다 인스턴스 새로 생성
 	String bad = new String("반복문 안이면 폭망");
@@ -351,7 +385,8 @@
 * [불변객체(item 17)](../ch04/README.md)는 항상 재사용 가능
 * 반복문 안에서는 중요한 이슈가 될 수 있음
 
-### 캐싱하여 재사용
+### __캐싱하여 재사용__
+
 ```java
 	public class RomanNumerals {
 		// 1.불변인 `Pattern` 인스턴스를 클래스 초기화 과정에서 생성 후 캐싱
@@ -363,7 +398,8 @@
 	}
 ```
 
-### 주의! Auto Boxing(자동 형변환)
+### __주의! Auto Boxing(자동 형변환)__
+
 ```java
 	private static long sum() {
 		Long sum = 0L; // Long 보다 long을 사용하라
@@ -377,10 +413,13 @@
 	}
 ```
 
+
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 07. Eliminate Object Reference
+
+[[TOC]](#목차)
+
 `[객체소멸]` 다 쓴 참조(obsolete reference) 객체는 NULL 처리하라.
 * __Stack 메모리 누수 다루기__
 	```java
@@ -446,12 +485,18 @@ output :
 	2000=test b
 */
 ```
+
+
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 08. Avoid finalizer and cleaner
+
+[[TOC]](#목차)
+
 `[객체소멸]` `finalizer` & `cleaner`는 피하라
-### 객체 소멸자 : (`finalizer`, `cleaner`)
+
+### __객체 소멸자 : (`finalizer`, `cleaner`)__
+
 * `finalizer`
 	* 예측 불가능, 위험 가능성으로 일반적 불필요
 	* 오동작, 낮은 성능, 이식성 문제의 원인
@@ -460,7 +505,8 @@ output :
 	* finalizer의 대안으로 등장 (덜 위험함)
 	* 예측 불가능, 느림, 일반적으로 불필요
 
-### 사용 자제 이유
+### __사용 자제 이유__
+
 1. 실제 소멸 수행 시점을 알 수 없음 (보장이 안됨)
 	> 상태를 영구적으로 수정하는 작업에서는 절대 finalizer or cleaner에 의존하면 안됨
 2. 심각한 성능 문제가 동반될 수 있음
@@ -468,16 +514,23 @@ output :
 3. `finalizer 공격` 노출로 심각한 보안문제 유발 가능
 	> 방어 방법 : 빈 finalize 메소드 생성 후 final로 선언
 
-### 사용하는 곳
+### __사용하는 곳__
+
 1. 자원 소유자가 `close()`를 호출하지 않는 것에 대비한 안전망 역할
 	> `FileInputStream`, `FileOutputStream`, `ThreadPoolExecutor` 에서 안전망 역할의 finalizer 제공함
 2. 네이티브 피어(`Native Peer`)와 연결된 객체 자원 회수용으로 사용
+
+
 -----------------------------------------------------------------
-[[TOC]](#목차)
 
 ## item 09. try-with-resources
+
+[[TOC]](#목차)
+
 `[객체소멸]` : ( [StockUtils.java : getHtml(url)](./StockUtils.java) )
-### try - with -resources
+
+### __try - with -resources__
+
 ```java
 	try (SomeResource resource = getResource()) {
 		use(resource);
@@ -485,6 +538,7 @@ output :
 		...
 	}
 ```
+
 try에 복수 자원 객체 전달
 ```java
 try (Something1 s1 = new Something1(); Something2 s2 = new Something2()) {
@@ -493,6 +547,7 @@ try (Something1 s1 = new Something1(); Something2 s2 = new Something2()) {
     ...
 }
 ```
+
 `try-with-resources` 구조를 사용할려면 __`AutoCloseable` 인터페이스를 구현해야 함__
 ```java
 public interface AutoCloseable {
