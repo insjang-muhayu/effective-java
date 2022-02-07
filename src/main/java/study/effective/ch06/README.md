@@ -461,9 +461,6 @@ public enum ExtendedOper implements Oper {
 ```
 
 ### __타입수준에서의 확장된 열거타입__
-* `Class 객체`를 넘기는 방법
-
-* `Collection<? extends Oper>`을 넘기는 방법
 ```java
 public class ImplementsEnumTest {
 	@Test
@@ -489,15 +486,15 @@ public class ImplementsEnumTest {
 	}
 }
 ```
+* `Class 객체`를 넘기는 방법
+* `Collection<? extends Oper>`을 넘기는 방법
 
-```java
-
-```
-
-```java
-
-```
-
+### 단점
+* 인터페이스를 이용해 확장 가능한 열거타입을 구현하는 방법에는 __"열거 타입끼리 구현을 상속할수 없다"__ 
+* 코드중복 제거방법 (확장 Enum 타입끼리 로직을 공유하려 할 때) :
+	- 별도의 **helper class** 작성
+	- **static helper method**로 분리
+	- 디폴트 메서드(item-20) : 아무 상태에도 의존하지 않는 경우
 
 ---------------------------------------------------------------
 
