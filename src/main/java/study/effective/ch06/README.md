@@ -536,7 +536,7 @@ public class ImplementsEnumTest {
 
 ```java
 public class I39_Sample {
-	@I39_Test public static void m1() { } // 설공
+	@I39_Test public static void m1() { } // 성공
 	public static void m2() { }
 	@I39_Test public static void m3() { throw new RuntimeException("실패"); } // 실패
 	public static void m4() { }
