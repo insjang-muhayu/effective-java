@@ -502,28 +502,118 @@ public class ImplementsEnumTest {
 
 [[TOC]](#목차)
 
+### 명명패턴 (Naming Patterns)
 
+* 기존에는 도구나 프레임워크가 다뤄야할 프로그램 요소에 대해 **명명패턴**을 통해 구분하고자 함
+* 예) JUnit 3에서 테스트 메서드 이름을 `testXxxx` 형식으로 사용
+* 명명패턴 단점 :
+	- 오타가 나면 안됨 (패턴규칙에 벋어나면 안됨)
+	- 올바른 프로그램 요소에서만 사용된다고 보장 못함
+	- 프로그램 요소를 매개변수로 전달할 마땅한 방법이 없음
+	- 컴파일러는 문자열이 무엇을 가리키는지 모름
+
+### 어노테이션 (Annotations)
+
+명명패턴의 단점을 해결하고자 **Annotation** 등장 (JUnit 4부터 어노테이션 전면 도입)
+
+#### [메타 어노테이션]
 
 ```java
+	import java.lang.annotation.*;
 
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.METHOD)
+	public @interface I39_Test { }
+```
+**Meta-Annotation** : `@Retention`과 `@Target`과 같이 어노테이션 선언에 다는 어노테이션
+* `@Retention(RetentionPolicy.RUNTIME)` : 런타임에도 유지됨
+* `@Target(ElementType.METHOD)` : 메서드 선언에서만 사용
+
+#### [마커 어노테이션]
+**Marker-Annotation** : `@Test` 처럼 아무 매개변수 없이 단순히 대상에 마킹만 하는 어노테이션
+* 대상 코드의 의미는 그대로 두고, 그 어노테이션에 관심 있는 도구에서 특별한 처리를 가능하게 해줌
+* 실제 클래스에 영향은 주지 않으며, 어노테이션에 관심있는 프로그램에 추가 정보를 제공
+
+```java
+public class I39_Sample {
+	@I39_Test public static void m1() { } // 설공
+	public static void m2() { }
+	@I39_Test public static void m3() { throw new RuntimeException("실패"); } // 실패
+	public static void m4() { }
+	@I39_Test public void m5() { } // 잘못 사용한 예: 정적 메서드가 아니다.
+	public static void m6() { }
+	@I39_Test public static void m7() { throw new RuntimeException("실패"); } // 실패
+	public static void m8() { }
+}
 ```
 
 ```java
+import java.lang.reflect.*;
 
+public class I39_RunTests {
+	public static void main(String[] args) 
+		throws ClassNotFoundException, InvocationTargetException, IllegalAccessException 
+	{
+		int tests = 0; int passed = 0;
+		Class<?> testClass = Class.forName("study.effective.ch06.I39_Sample"); //(args[0]);
+		for (Method m : testClass.getDeclaredMethods()) {
+			if (m.isAnnotationPresent(I39_Test.class)) {
+				tests++;
+				try {
+					m.invoke(null);
+					passed++;
+				} catch (InvocationTargetException wrappedExc) {
+					Throwable exc = wrappedExc.getCause();
+					System.out.println(m + "실패: " + exc);
+				} catch (Exception exception) {
+					System.out.println("잘못 사용한 @I39_Test: " + m);
+				}
+			}
+		}
+		System.out.printf("성공: %d, 실패: %d%n", passed, tests - passed);
+	}
+}
+
+// public static void study.effective.ch06.I39_Sample.m3()실패: java.lang.RuntimeException: 실패
+// public static void study.effective.ch06.I39_Sample.m7()실패: java.lang.RuntimeException: 실패
+// 잘못 사용한 @I39_Test: public void study.effective.ch06.I39_Sample.m5()
+// 성공: 1, 실패: 3
+
+```
+
+#### [단일 매개변수를 받는 어노테이션]
+
+```java
+// 명시한 예외를 던저야만 성공하는 테스트 메서드 어노테이션
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface I39_ExceptOne {
+	Class<? extends Throwable> value();
+}
+```
+
+#### [배열 매개변수를 받는 어노테이션]
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface I39_ExceptArr {
+	Class<? extends Throwable> [] value();
+}
 ```
 
 ```java
+public class I39_ExceptRunTests {
+	@I39_ExceptArr({IndexOutOfBoundsException.class, NullPointerException.class})
+	public static void doublyBad() { // 성공해야 한다.
+		List<String> list = new ArrayList<>();
 
+		// 자바 API 명세에 따르면 다음 메서드는 
+		// IndexOutOfBoundsException이나 NullPointerException을 던질 수 있다.
+		list.addAll(5, null);
+	}
+}
 ```
-
-```java
-
-```
-
-```java
-
-```
-
 
 ---------------------------------------------------------------
 
