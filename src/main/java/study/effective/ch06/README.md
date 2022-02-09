@@ -581,7 +581,7 @@ public class I39_RunTests {
 
 ```
 
-#### [단일 매개변수를 받는 어노테이션]
+#### __[단일 매개변수를 받는 어노테이션]__
 
 ```java
 // 명시한 예외를 던저야만 성공하는 테스트 메서드 어노테이션
@@ -592,7 +592,7 @@ public @interface I39_ExceptOne {
 }
 ```
 
-#### [배열 매개변수를 받는 어노테이션]
+#### __[배열 매개변수를 받는 어노테이션]__
 
 ```java
 @Retention(RetentionPolicy.RUNTIME)
@@ -616,7 +616,11 @@ public class I39_ExceptRunTests {
 ```
 
 
-#### [반복 가능한 어노테이션 타입]
+#### __[반복 가능한 어노테이션 타입]__
+
+* 자바 8에서는 여러 개의 값을 받는 애너테이션을 다른 방식으로도 만들 수 있다.
+* 배열 매개변수를 사용하는 대신 애너테이션에 @Repeatable 메타애너테이션을 다는 방식이다.
+* @Repeatable을 단 애너테이션은 하나의 프로그램 요소에 여러 번 달 수 있다.
 
 **Repeatable 어노테이션**
 ```java
@@ -629,7 +633,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Repeatable(ExceptionTestContainer.class)
 public @interface ExceptionTest {
-    Class<? extends Throwable> value();
+	Class<? extends Throwable> value();
 }
 ```
 
@@ -643,7 +647,16 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ExceptionTestContainer {
-    ExceptionTest[] value();
+	ExceptionTest[] value();
+}
+```
+```java
+@ExceptionTest(IndexOutOfBoundsException.class)
+@ExceptionTest(NullPointerException.class)
+public static void doubleBad() {
+	List<String> list = new ArrayList<>();
+	// IndexOutOfBoundsException, NullPointerException
+	list.addAll(5, null);
 }
 ```
 
