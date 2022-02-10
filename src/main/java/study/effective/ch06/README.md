@@ -666,27 +666,60 @@ public static void doubleBad() {
 
 [[TOC]](#목차)
 
+```java
+package java.lang;
+import java.lang.annotation.*;
 
+@Target(ElementType.METHOD) // 메서드 선언에만 달 수 있음
+@Retention(RetentionPolicy.SOURCE) // 소스코드(.java)까지 유지
+public @interface Override { }
+```
+* `@Override`는 상위 타입 메서드를 재정의할 때 사용
+* `@Override`를 일관되게 사용하면, 여러 버그 예방 가능
 
 ```java
+public class Biagram {
+	private final char first;
+	private final char second;
 
+	public Biagram(char first, char second) {
+		this.first = first;
+		this.second = second;
+	}
+	@Override public boolean equals(Biagram b) { // @Override로 버그예방
+		return b.first == first && b.second == second;
+	}
+	@Override public int hashCode() { // @Override로 버그예방
+		return 31 * first + second;
+	}
+	public static void main(String[] args) {
+		Set<Biagram> s = new HashSet<>(); // Set이므로 중복 불허
+		for (int i = 0; i < 10; i++) {
+			for (char ch = 'a'; ch <= 'z'; ch++) {
+				s.add(new Biagram(ch, ch));
+			}
+		}
+		// @Override 안쓸경우 260 출력 (원하는 결과는 26)
+		System.out.println(s.size());
+	}
+}
 ```
 
-```java
-
+```
+java: method does not override or implement a method from a supertype
 ```
 
-```java
+`@Override`를 붙이게 되면 컴파일러는 해당 메서드가 상위메서드와 다르다는 것을 찾아 오류가 발생하며, 올바르게 수정할 수 있다.
 
-```
+__상위클래스의 메서드를 재정의하는 모든 메서드에 `@Override` 를 다는 것을 권장한다.__
+단, 상위 클래스의 추성메서드는 굳이 `@Override`를 달지 않아도 된다.
 
-```java
-
-```
-
-```java
-
-```
+@Override 어노테이션 정리 :
+* 클래스, 인터페이스의 메서드를 재정의할 때 사용
+* 시그니처가 올바른지 재차 확인 가능
+* 컴파일타임에 오류 발견 가능
+* 추상클래스에서는 상위클래스의 메서드를 재정의한 모든 메서드에 추가하는 것을 권장
+* 추상 메서드는 굳이 어노테이션을 달지 않아도 됨
 
 
 ---------------------------------------------------------------
