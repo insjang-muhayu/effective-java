@@ -729,26 +729,66 @@ __상위클래스의 메서드를 재정의하는 모든 메서드에 `@Override
 [[TOC]](#목차)
 
 
+마커 인터페이스(marker interface)란? 
+> 일반적인 인터페이스와 동일하지만, 아무 메서드도 선언하지 않은 인터페이스이다. (단순 타입 체크용) 
+> (Serializable, Cloneable, EventListener)
 
 ```java
+  package java.io;
+  public interface Serializable {  }
+```
 
+`Serializable` 인터페이스를 구현한 클래스는 `ObjectOutputStream`을 통해 직렬화할 수 있다.
+```java
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import java.math.BigDecimal;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class Item { // Serializable을 구현하지 않음
+	private long id;
+	private String name;
+	private BigDecimal price;
+}
 ```
 
 ```java
-
+public class SerializableTest {
+	@Test void serializableTest() throws IOException {
+		File f = new File("test.txt");
+		ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(f));
+		// java.io.NotSerializableException 예외 발생 !!! 
+		// 단순히 Serializable이 구현되었는지 타입 확인 정도만 하고 있다. (마커 인터페이스)
+		objectOutputStream.writeObject(new Item(1L, "item A", new BigDecimal(30000)));
+	}
+}
 ```
 
-```java
+### 마커 어노테이션 vs 마커 인터페이스
 
-```
+* 마커 인터페이스를 구현한 클래스의 인스턴스를 구분하는 타입으로 쓸 수 있다. 마커 어노테이션은 구분하는 타입으로 사용할 수 없으며, 마커 어노테이션의 경우 런타임시 발견할 오류를 마커 인터페이스를 구현하면 컴파일타임에 발견할 수 있다.
+	- 위에서 살펴본 ObjectOutputStream.writeObject는 런타임시 문제를 확인하므로 이러한 마커 인터페이스의 장점을 살리지 못한 케이스이다.
+* 마커 인터페이스는 적용 대상을 더 정밀하게 지정할 수 있다.
+	- 마커 어노테이션은 ElevmentType.Type 으로 타겟을 지정하므로 모든 타입(클래스, 인터페이스, 열거 타입, 어노테이션)에 적용된다.
+	- 마킹하고 싶은 특정 클래스에서만 마커 인터페이스를 구현하여 적용대상을 더 정밀하게 지정할 수 있다.
+* 마커 어노테이션은 거대한 어노테이션 시스템의 지원을 받을 수 있다.
+	- 어노테이션을 적극적으로 사용하는 프레임워크에서는 마커 어노테이션을 쓰는 것이 일관성을 지키는데 유리
 
-```java
 
-```
+### 마커 어노테이션, 마커 인터페이스 사용할 때
 
-```java
+* 마커 어노테이션 사용
+	- 클래스, 인터페이스 외 프로그램 요소(모듈, 패키지, 필드, 지역변수 등)에 마킹해야하는 경우
+		> 클래스와 인터페이스만이 인터페이스를 구현하거나 확장이 가능
+	- 어노테이션을 적극적으로 사용하는 프레임워크
 
-```
+* 마커 인터페이스 사용
+	- 마킹된 객체를 매개변수로 받는 메서드를 작성해야할 때
+		> (마커 인터페이스를 해당 메서드의 매개변수 타입으로 사용하면 컴파일타임에 오류 발생)
+	- 새로 추가하는 메서드 없이 단지 타입 정의가 목적인 경우
 
 
 ---------------------------------------------------------------
