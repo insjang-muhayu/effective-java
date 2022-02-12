@@ -730,12 +730,14 @@ __상위클래스의 메서드를 재정의하는 모든 메서드에 `@Override
 
 
 마커 인터페이스(marker interface)란? 
-> 일반적인 인터페이스와 동일하지만, 아무 메서드도 선언하지 않은 인터페이스이다. (단순 타입 체크용) 
+> 일반적인 인터페이스와 동일하지만, 아무 메서드도 없는 인터페이스 (단순 타입 체크용) 
 > (Serializable, Cloneable, EventListener)
 
 ```java
   package java.io;
-  public interface Serializable {  }
+  public interface Serializable {  
+	  // 아무 메서드가 없다.
+  }
 ```
 
 `Serializable` 인터페이스를 구현한 클래스는 `ObjectOutputStream`을 통해 직렬화할 수 있다.
@@ -745,9 +747,7 @@ import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Getter @Setter @AllArgsConstructor
 public class Item { // Serializable을 구현하지 않음
 	private long id;
 	private String name;
@@ -759,26 +759,43 @@ public class Item { // Serializable을 구현하지 않음
 public class SerializableTest {
 	@Test void serializableTest() throws IOException {
 		File f = new File("test.txt");
-		ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(f));
+		ObjectOutputStream ostream = new ObjectOutputStream(new FileOutputStream(f));
 		// java.io.NotSerializableException 예외 발생 !!! 
-		// 단순히 Serializable이 구현되었는지 타입 확인 정도만 하고 있다. (마커 인터페이스)
-		objectOutputStream.writeObject(new Item(1L, "item A", new BigDecimal(30000)));
+		// 단순 Serializable이 구현되었는지 타입확인 정도만 수행 (마커인터페이스)
+		ostream.writeObject(new Item(1L, "item A", new BigDecimal(30000)));
+	}
+}
+```
+`ObjectOutputStream.writeObject0` 소스 중 `NotSerializableException` 예외 발생 부분
+```java
+if (obj instanceof String) { writeString((String) obj, unshared); } 
+else if (cl.isArray()) { writeArray(obj, desc, unshared); } 
+else if (obj instanceof Enum) { writeEnum((Enum<?>) obj, desc, unshared); } 
+else if (obj instanceof Serializable) { writeOrdinaryObject(obj, desc, unshared); } 
+else {
+	if (extendedDebugInfo) {
+		throw new NotSerializableException(cl.getName() + "\n" + debugInfoStack.toString());
+	} else {
+		throw new NotSerializableException(cl.getName());
 	}
 }
 ```
 
-### 마커 어노테이션 vs 마커 인터페이스
+### __마커 인터페이스 장점__
 
-* 마커 인터페이스를 구현한 클래스의 인스턴스를 구분하는 타입으로 쓸 수 있다. 마커 어노테이션은 구분하는 타입으로 사용할 수 없으며, 마커 어노테이션의 경우 런타임시 발견할 오류를 마커 인터페이스를 구현하면 컴파일타임에 발견할 수 있다.
-	- 위에서 살펴본 ObjectOutputStream.writeObject는 런타임시 문제를 확인하므로 이러한 마커 인터페이스의 장점을 살리지 못한 케이스이다.
-* 마커 인터페이스는 적용 대상을 더 정밀하게 지정할 수 있다.
-	- 마커 어노테이션은 ElevmentType.Type 으로 타겟을 지정하므로 모든 타입(클래스, 인터페이스, 열거 타입, 어노테이션)에 적용된다.
-	- 마킹하고 싶은 특정 클래스에서만 마커 인터페이스를 구현하여 적용대상을 더 정밀하게 지정할 수 있다.
-* 마커 어노테이션은 거대한 어노테이션 시스템의 지원을 받을 수 있다.
-	- 어노테이션을 적극적으로 사용하는 프레임워크에서는 마커 어노테이션을 쓰는 것이 일관성을 지키는데 유리
+* 구현 클래스의 인스턴스를 구분하는 타입으로 쓸 수 있다.
+* 런타임시 발견될 오류를 컴파일타임에 발견할 수 있다.
+	> 위에 `ObjectOutputStream.writeObject`는 이 잇점을 못살림 (실제 런타임시 발생)
+* 적용 대상을 더 정밀하게 지정할 수 있다.
+	- 마커 어노테이션은 `@Target(ElementType.TYPE)` 으로 타겟을 지정하므로 모든 타입(클래스, 인터페이스, 열거타입, 어노테이션)에 적용
+	- 마킹하고 싶은 클래스에만 마커인터페이스를 구현하여 적용대상을 더 정밀 지정
 
+### __마커 어노테이션 장점__
 
-### 마커 어노테이션, 마커 인터페이스 사용할 때
+* 거대한 어노테이션 시스템의 지원을 받는다
+* 어노테이션을 적극 활용하는 프레임워크에서는 어노테이션을 사용하는게 일관성에 좋다.
+
+### __마커 어노테이션, 마커 인터페이스 사용할 때__
 
 * 마커 어노테이션 사용
 	- 클래스, 인터페이스 외 프로그램 요소(모듈, 패키지, 필드, 지역변수 등)에 마킹해야하는 경우
@@ -786,8 +803,8 @@ public class SerializableTest {
 	- 어노테이션을 적극적으로 사용하는 프레임워크
 
 * 마커 인터페이스 사용
-	- 마킹된 객체를 매개변수로 받는 메서드를 작성해야할 때
-		> (마커 인터페이스를 해당 메서드의 매개변수 타입으로 사용하면 컴파일타임에 오류 발생)
+	- 마킹된 객체를 매개변수로 받는 메서드를 작성해야 할 때
+		> 마커인터페이스를 해당 메서드의 매개변수 타입으로 사용하면 컴파일타임에 오류발생
 	- 새로 추가하는 메서드 없이 단지 타입 정의가 목적인 경우
 
 
