@@ -714,7 +714,7 @@ java: method does not override or implement a method from a supertype
 __상위클래스의 메서드를 재정의하는 모든 메서드에 `@Override` 를 다는 것을 권장한다.__
 단, 상위 클래스의 추성메서드는 굳이 `@Override`를 달지 않아도 된다.
 
-@Override 어노테이션 정리 :
+__@Override 어노테이션 정리 :__
 * 클래스, 인터페이스의 메서드를 재정의할 때 사용
 * 시그니처가 올바른지 재차 확인 가능
 * 컴파일타임에 오류 발견 가능
@@ -729,7 +729,7 @@ __상위클래스의 메서드를 재정의하는 모든 메서드에 `@Override
 [[TOC]](#목차)
 
 
-마커 인터페이스(marker interface)란? 
+### __마커 인터페이스(marker interface)란?__
 > 일반적인 인터페이스와 동일하지만, 아무 메서드도 없는 인터페이스 (단순 타입 체크용) 
 > (Serializable, Cloneable, EventListener)
 
@@ -785,7 +785,7 @@ else {
 
 * 구현 클래스의 인스턴스를 구분하는 타입으로 쓸 수 있다.
 * 런타임시 발견될 오류를 컴파일타임에 발견할 수 있다.
-	> 위에 `ObjectOutputStream.writeObject`는 이 잇점을 못살림 (실제 런타임시 발생)
+	- 위에 `ObjectOutputStream.writeObject`는 이 잇점을 못살림 (실제 런타임시 발생)
 * 적용 대상을 더 정밀하게 지정할 수 있다.
 	- 마커 어노테이션은 `@Target(ElementType.TYPE)` 으로 타겟을 지정하므로 모든 타입(클래스, 인터페이스, 열거타입, 어노테이션)에 적용
 	- 마킹하고 싶은 클래스에만 마커인터페이스를 구현하여 적용대상을 더 정밀 지정
