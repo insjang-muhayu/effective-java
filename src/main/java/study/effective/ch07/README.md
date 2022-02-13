@@ -174,19 +174,55 @@ public class I42_OperLambda {
 
 [[TOC]](#목차)
 
-### **gggg**
+### **메서드 참조**
+
+함수객체를 람다 보다 더 간결하게 구현할 수 있는 메서드 참조(method reference)를 사용하라
+
+* __람다__
+	```java
+	default V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> func) {
+		Objects.requireNonNull(func);
+		Objects.requireNonNull(value);
+		V oldValue = get(key);
+		V newValue = (oldValue == null) ? value : func.apply(oldValue, value);
+		if (newValue == null) remove(key);
+		else put(key, newValue);
+
+		return newValue;
+	}
+	```
+
+	```java
+	// 키가 맵 안에 없으면 키와 숫자 1을 매핑하고, 이미 있다면 기존 매핑 값을 증가
+	map.merge(key, 1, (count, incr) -> count + incr);
+	```
+
+* __메서드 참조__
+	> 람다대신 메서드 참조를 전달하면 똑같은 결과도 더 간결하게 구현할 수 있다.
+	```java
+	public final class Integer extends Number implements Comparable<Integer> {
+		...
+		public static int sum(int a, int b) {
+			return a + b;
+		}
+		...
+	}
+	```
+
+	```java
+	map.merge(key, 1, Integer::sum);
+	```
+
+람다와 메서드가 모두 `GoshThisClassNameIsHumonous` 클래스에 있다면 람다로 구현한 것이 더 간결하고, 명확하다.
 
 ```java
+// 메서드 참조
+service.execute(GoshThisClassNameIsHumonous::action);
 
+// 람다
+service.execute(() -> action());
 ```
-
-```java
-
-```
-
-```java
-
-```
+### **메서드 참조 유형**
 
 ```java
 
