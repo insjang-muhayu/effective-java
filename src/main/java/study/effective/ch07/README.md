@@ -176,7 +176,7 @@ public class I42_OperLambda {
 
 ### **메서드 참조**
 
-함수객체를 람다 보다 더 간결하게 구현할 수 있는 메서드 참조(method reference)를 사용하라
+함수객체를 **"람다"** 보다 더 간결하게 구현할 수 있는 **"메서드참조(method reference)"**
 
 * __람다__
 	```java
@@ -202,9 +202,7 @@ public class I42_OperLambda {
 	```java
 	public final class Integer extends Number implements Comparable<Integer> {
 		...
-		public static int sum(int a, int b) {
-			return a + b;
-		}
+		public static int sum(int a, int b) { return a + b; }
 		...
 	}
 	```
@@ -224,10 +222,15 @@ service.execute(() -> action());
 ```
 ### **메서드 참조 유형**
 
-```java
+| 유형              | 예                        | 람다                          |
+| ----------------- | ------------------------- | ----------------------------- |
+| 정적              | Integer::parseInt         | str -> Integer.parseInt(str)  |
+| 한정적(인스턴스)  | Instant.now()::isAfter    | Instant then = instant.now();<br> t -> then.isAfter(t); |
+| 비한정적(인스턴스)| String::toLowerCase       | str -> str.toLowerCase()      |
+| 클래스 생성자     | TreeMap::new              | () -> new TreeMap()           |
+| 배열 생성자       | int[]::new                | len -> new int[len]           |
 
-```
-
+**메서드참조가 더 짧고 명확하다면 메서드참조를, 그렇지 않다면 람다를 사용**
 
 ---------------------------------------------------------------
 
