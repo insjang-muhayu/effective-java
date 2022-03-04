@@ -238,23 +238,63 @@ service.execute(() -> action());
 
 [[TOC]](#목차)
 
-### **gggg**
+### **표준 함수형 인터페이스**
 
 ```java
+@FunctionInterface interface EldestEntryRemovalFunction<K, V> {
+    boolean remove(Map<K,V> map, Map.Entry<K, V> eldest);
+}
 
+// 위 EldestEntryRemovalFunction 를 표준 함수형 인터페이스로 대체 가능
+BiPredicate<Map<K,V>, Map.Entry<K,V> eldest>
 ```
 
-```java
+필요한 용도에 맞는게 있다면, 직접 구현하는 것보다 표준 함수형 인터페이스를 활용하는 것이 좋다
 
-```
+| 인터페이스		| 함수 시그니처			| 설명										| 예					|
+| ----------------- | --------------------- | ----------------------------------------- | --------------------- |
+|`UnaryOperator<T>`	|`T apply(T t)`			| 반환값과 인수타입이 같은 함수, 인수 1개	| `String::toLowerCase`	|
+|`BinaryOperator<T>`|`T apply(T t1, T t2)`	| 반환값과 인수타입이 같은 함수, 인수 2개	| `BigInteger::add`		|
+|`Predicate<T>`		|`boolean test(T t)`	| 1개 인수를 받아 boolean을 반환하는 함수	| `Collection::isEmpty`	|
+|`Function<T,R>`	|`R apply(T t)`			| 인수와 반환 타입이 다른 함수				| `Arrays::asList`		|
+|`Supplier<T>`		|`T get()`				| 인수를 받지않고 값을 반환, 제공하는 함수	| `Instant::now`		|
+|`Consumer<T>`		|`void accept(T t)`		| 한 개의 인수를 받고 반환값이 없는 함수	| `System.out::println`	|
 
-```java
+* 기본 인터페이스는 기본 타입인 int, long, double용으로 각 3개씩 변형이 있다.
+* 표준 함수형 인터페이스는 대부분 기본 타입만 지원한다. 
 
-```
+### **직접 구현**
+표준 함수형 인터페이스 중 필요한 용도에 맞는게 없다면 직접 구현해야한다.
 
-```java
+* 자주 쓰이며, 이름 자체가 용도를 명확히 설명
+* 반드시 지켜야할 규약이 있음
+* 유용한 디폴트 메서드를 제공할 수 있음
 
-```
+3가지 이유 중 하나 이상을 만족한다면 전용 함수형 인터페이스를 구현할지 고민해보는 것이 좋다.
+
+* **`Comparator` 인터페이스**
+	```java
+	// 직접 구현 함수형 인터페이스
+	@FunctionalInterface
+	public interface Comparator<T> { int compare(T o1, T o2); }
+	```
+
+* **`BiFunction<T, U>`**
+	```java
+	// 표준 함수형 인터페이스
+	@FunctionalInterface 
+	public interface ToIntBiFunction<T, U> { int applyAsInt(T t, U u); }
+	```
+
+### **@FunctionInterface**
+
+@FunctionInterface 어노테이션은 프로그래머의 의도를 명시하는 것으로 3가지 목적이 있다.
+
+* 해당 인터페이스가 람다용으로 설계된 것임을 명시
+* 해당 인터페이스가 추상 메서드를 오직 한개만 가지고 있어야 컴파일 가능
+* 유지보수 과정에서 누군가 실수로 메서드를 추가하지 못하게 막아줌
+
+즉, 직접 만든 함수형 인터페이스에는 항상 @FunctionInterface 어노테이션을 붙여줘야한다.
 
 
 ---------------------------------------------------------------
