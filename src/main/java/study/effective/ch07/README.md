@@ -303,23 +303,158 @@ BiPredicate<Map<K,V>, Map.Entry<K,V> eldest>
 
 [[TOC]](#목차)
 
-### **gggg**
+* __스트림 (Stream)__ : 데이터 원소의 유한/무한 시퀀스를 뜻함
+* __스트림 파이프라인 (Stream Pipeline)__ : 원소들로 수행하는 연산 단계를 표현
 
+### **대표적인 스트림 소스**
+* 컬렉션 (Collection)
+* 배열 (Array)
+* 파일 (File)
+* 정규표현식 (Regex Pattern Matcher)
+* 난수생성기 (Random Generator)
+* 기본 스트림
+	- IntStream
+	- LongStream
+	- DoubleStream
+
+
+
+### **스트림 연산**
+> 소스 스트림에서 시작해 __종단연산__ 으로 끝나며, 그 사이에 하나 이상의 __중간연산__ 이 있을 수 있다.
+
+* __중간 연산 ([intermediate operation](https://www.javacodegeeks.com/2020/04/java-8-stream-intermediate-operations-methods-examples.html))__
+	| 중간 연산 함수 									| 설명											|
+	| ------------------------------------------------- | --------------------------------------------	|
+	| `filter(Predicate<? super T> predicate)`			| predicate 함수에 맞는 요소만 사용하도록 필터	|
+	| `map(Function<? Super T, ? extends R> func)`		| 요소 각각의 function 적용						|
+	| `flatMap(Function<? Super T, ? extends R> func)`	| 스트림의 스트림을 하나의 스트림으로 변환		|
+	| `distinct()`										| 스트림 내의 중복 요소 제거					|
+	| `sorted()`										| 기본 정렬										|
+	| `sorted(Comparator<? super T> comparator)`		| comparator 함수를 이용하여 정렬				|
+	| `peek(Consumer<? super T> action)`				| 각각의 요소를 대상으로 특정 연산을 수행		|
+	| `limit(long maxSize)`								| maxSize 갯수만큼만 출력						|
+	| `skip(long n)`									| n개 만큼의 스트림 요소 건너뜀					|
+
+	```java
+	// filter()
+	Stream inp1 = Stream.of(1, 2, 3, 4, 5);
+	Stream sub1 = inp1.filter((val) -> val > 3);
+	System.out.println(sub1.count());	// 2
+
+	// map()
+	Stream inp2 = Stream.of("Welcome", "To", "java", "blog");
+	Stream sub2 = inp2.map(str -> { return (str.equals("java"))? "Insjang" : str; });
+	System.out.println(sub2.collect(Collectors.toList())); // [Welcome, To, Insjang, blog]
+
+	// flatMap()
+	String[] arr = {"I study hard", "You study JAVA", "I am hungry"};
+	Stream<String> inp3 = Arrays.stream(arr);
+	Stream sub3 = inp3.flatMap(list -> list.stream());
+	//sub3.forEach(System.out::println);
+	System.out.println(sub3.distinct().count()); // 3
+
+	// Stream sorted()
+	Stream.of("tomoto", "Green Chilli", "Pototo", "Beet root")
+		.sorted().forEach(System.out::println); // Beet root\nGreen Chilli\nPototo\ntomoto
+		
+	// Stream limit​(long maxSize)
+	Stream.of("one", "two", "three", "four")
+		.limit(2).forEach(System.out::println); // one\ntwo
+	
+	// Stream skip​(long n)
+	Stream.of("one", "two", "three", "four", "five")
+		.skip(2).forEach(System.out::println); // three\nfour\nfive
+	```
+
+* __종단 연산 (terminal operation)__
+
+	| 종단 연산 함수                            | 설명                                              |
+	| ----------------------------------------- | ------------------------------------------------- |
+	| `forEach(Consumer<? super T> consumer)`   | Stream의 요소를 순회                              |
+	| `reduce(BinaryOperator<T> accu)`			| 요소를 처리하여 하나의 결과로 만듦				|
+	| `collect(Collector<? super T,A,R> coll)`	| 연산 결과를 컬렉션 형태로 모아줌					|
+	| `allMatch(Predicate<? super T> predi)`    | 모든 요소가 predi함수에 만족하면 true             |
+	| `anyMatch(Predicate<? super T> predi)`    | 하나의 요소라도 predi함수에 만족하면 true         |
+	| `noneMatch(Predicate<? super T> predi)`   | 모든 요소가 predi함수에 만족 안하면 true          |
+	| `count()`                                 | 요소 수 반환                                      |
+	| `max(Comparator<? super T> comp)`         | 최대 값 반환 (Optional 반환)                      |
+	| `min(Comparator<? super T> comp)`         | 최소 값 반환 (Optional 반환)                      |
+	| `sum()`                                   | 요소의 합 (IntStream, LongStream, DoubleStream)   |
+	| `average()`                               | 요소의 평균 (Optional 반환)                       |
+
+
+
+	```java
+	Stream.of("넷", "둘", "셋", "하나").forEach(System.out::println);
+
+	Stream.of("넷", "둘", "셋", "하나")
+		.reduce((s1, s2) -> s1 + "++" + s2).ifPresent(System.out::println);
+
+	Stream.of("넷", "둘", "셋", "하나")
+		.reduce("시작", (s1, s2) -> s1 + "++" + s2).ifPresent(System.out::println);
+
+	System.out.println(IntStream.of(30, 90, 70, 10).anyMatch(n -> n > 80)); // true
+	System.out.println(IntStream.of(30, 90, 70, 10).allMatch(n -> n > 80)); // false
+
+	System.out.println(IntStream.of(30, 90, 70, 10).count()); // 4
+	System.out.println(IntStream.of(30, 90, 70, 10).sum()); // 200
+
+	System.out.println(IntStream.of(30, 90, 70, 10).max().getAsInt()); // 90
+	System.out.println(DoubleStream.of(30.3, 90.9, 70.7, 10.1).average().getAsDouble()); // 50.5
+
+	Map<Boolean, List<String>> part = Stream.of("HTML", "CSS", "JAVA", "PHP")
+					.collect(Collectors.partitioningBy(s -> (s.length() % 2) == 0));
+	List<String> oddLengthList = part.get(false); System.out.println(oddLengthList);
+	List<String> evenLengthList = part.get(true); System.out.println(evenLengthList);
+
+	```
+
+### **지연 평가(Lazy evaluation)**
+* 평가는 종단연산이 호출될 때 진행되며, 종단연산에 사용되지 않은 데이터원소는 계산에 안쓰임
+* 지연평가는 무한스트림을 다룰 수 있게 해주는 핵심
+* 종단연산이 없는 스트림 파이프라인은 아무 일도 하지 않는 명령어인 `no-op`과 같음
+
+### **가독성**
+Stream을 적절히 활용한 코드
 ```java
+	public class Anagrams {
+		public static void main(String[] args) {
+			Path dictionary = Paths.get(args[0]);
+			int minGroupSize = Integer.parseInt(args[1]);
 
+			try (Stream<String> words = Files.lines(dictionary)) {
+				words.collect(groupingBy(word -> alphabetize(word)))
+					.values().stream()
+					.filter(group -> group.size() >= minGroupSize)
+					.forEach(g -> System.out.println(g.size() + ": " + g));
+			}
+		}
+
+		private static String alphabetize(String s) {
+			char[] a = s.toCharArray();
+			Arrays.sort(a);
+			return new String(a);
+		}
+	}
 ```
 
-```java
+### **코드 블록 vs 람다 블록**
 
-```
+* 코드블록
+	- 범위 안의 지역변수를 읽고 수정 가능
+	- `return`, `break`, `continue` 사용 가능
+	- 메서드 선언에 명시된 검사 예외(Exception)를 던질 수 있음
+* 람다블록
+	- `final` 이거나 사실상 `final`인 변수만 읽을 수 있으며, 지역변수를 수정하는건 불가능
+	- `return`, `break`, `continue` 문 사용 불가능
+	- 명시된 검사 예외 던지는것 불가능
 
-```java
-
-```
-
-```java
-
-```
+### **스트림을 사용하기 좋은 경우**
+* 원소들의 시퀀스를 일관되게 변환
+* 원소들의 시퀀스를 필터링
+* 원소들의 시퀀스를 하나의 연산을 사용하여 결합(더하기, 최솟값 구하기 등)
+* 원소들의 시퀀스를 컬렉션에 모으는 경우
+* 원소들의 시퀀스에서 특정 조건을 만족하는 원소를 찾는 경우1
 
 
 ---------------------------------------------------------------
