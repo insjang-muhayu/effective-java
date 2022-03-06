@@ -456,8 +456,16 @@ Stream을 적절히 활용한 코드
 [[TOC]](#목차)
 
 ### **스트림 패러다임**
+* 스트림 패러다임의 핵심은 __계산을 일련의 변환으로 재구성하는 부분__ 이다. 
+* 각 변환 단계는 가능한 이전 단계의 결과를 받아 처리하는 순수 함수여야한다.
+	> 순수함수 : 오직 입력만이 결과에 영향을 주는 함수 
 
-스트림을 제대로 활용한 코드
+
+
+### **스트림을 제대로 활용한 코드**
+
+`forEach` : 스트림이 수행한 연산 결과를 보여줄 때 사용하고, 계산할 때는 사용하지 말자
+
 ```java
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
@@ -467,6 +475,15 @@ import static java.util.stream.Collectors.toList;
 public class I46_Stream {
 	public static void main(String[] args) throws FileNotFoundException {
 		File file = new File("D:/temp/README.txt");
+
+		// [스트림 패러다임은 이해하지 못한채 API만 사용한 예]
+		// - forEach 내부에서 외부상태(freq)를 수정하는 람다를 실행하고 있으므로 순수함수가 아님
+		// - 같은 기능의 반복문보다 코드가 길고, 읽기 어려우며, 유지보수에도 나쁨
+//		Map<String, Long> freq = new HashMap<>();
+//		try (Stream<String> words = new Scanner(file).tokens()) {
+//			words.forEach(word -> { freq.merge(word.toLowerCase(), 1L, Long::sum); });
+//		}
+
 		Map<String, Long> freq;
 		try (Stream<String> words = new Scanner(file).tokens()) {
 			freq = words.collect(groupingBy(String::toLowerCase, counting()));
@@ -482,17 +499,131 @@ public class I46_Stream {
 }
 ```
 
-```java
+### **java.util.stream.Collectors**
 
+* `java.util.stream.Collectors` : 자주 사용하는 API 제공
+	- `Collectors` 멤버를 `static import` 사용해서 스트림 가독성이 좋아짐
+* 스트림의 원소를 손쉽게 컬렉션으로 생성 가능
+* 최종 처리 (스트림 종료 작업)
+
+#### **toList()**
+```java
+List<String> topTen = freq.keySet().stream()
+	.sorted(comparing(freq::get).reversed()) // Comparator.comparing
+	.limit(10)
+	.collect(toList()); // List 형태로 반환
 ```
 
+#### **toMap()**
 ```java
+Collector<T,?,Map<K,U>> toMap(
+	Function<? super T, ? extends K> keyMapper, 
+	Function<? super T, ? extends U> valueMapper)
+```
+* toMap수집기를 사용하여 문자열을 열거 타입 상수에 매핑
+	```java
+	private static final Map<String, Operation> stringToEnum = 
+		Stream.of(values()).collect(toMap(Object::toString, e -> e));
+	```
+* 각 키와 해당 키의 특정 원소를 연관 짓는 맵을 생성하는 수집기
+	```java
+	Map<Artist, Album> topHits = albums.collect(
+		toMap(Album::artist, a->a, maxBy(comparing(Album::sales))));
+	```
+* 마지막에 쓴 값을 취하는 수집기
+	```java
+	toMap(keyMapper, valueMapper, (oldVal, newVal) -> newVal);
+	```
 
+* 네번째 인수로 맵 팩터리(EnumMap, TreeMap, HashMap)를 받는 toMap
+	```java
+	Stream<String> s = Stream.of("apple", "banana", "apricot", "orange", "apple");
+	LinkedHashMap<Character, String> m = s.collect(
+		Collectors.toMap(
+			s1 -> s1.charAt(0), 
+			s1 -> s1, 
+			(s1, s2) -> s1 + "|" + s2, 
+			LinkedHashMap::new
+		)
+	);
+	```
+
+#### **groupingBy()**
+
+* 입력으로 분류 함수(classifier)를 받고 출력으로 원소들을 카테고리별로 모아 놓은 맵을 담은 수집기 반환
+	```java
+	Collector<T,?,Map<K,List<T>>> groupingBy(
+		Function<? super T, ? extends K> classifier)
+	```
+
+	```java
+	List<Product> productList = Arrays.asList(
+		new Product(23, "potatoes"),
+		new Product(14, "orange"),
+		new Product(13, "lemon"),
+		new Product(23, "bread"),
+		new Product(13, "sugar"));
+	
+	Map<Integer, List<Product>> collectorMapOfLists = productList.stream()
+		.collect(Collectors.groupingBy(Product::getAmount));
+	```
+
+* groupingBy가 반환하는 수집기(collector)가 리스트 외의 값을 갖는 맵을 생성하게 할 때 사용
+	```java
+	Collector<T, ?, Map<K,D>> groupingBy(
+		Function<? super T, ? extends K> classifier, 
+		Collector<? super T, A, D> downstream)
+	```
+	- 다운스트림 수집기(해당 카테고리의 모든 원소를 담은 스트림으로부터 값을 생성)도 명시 필요
+	- toSet() : 원소들의 리스트가 아닌 집합(Set)을 값으로 갖는 맵 생성
+	- toCollection(collectionFactory) : 컬렉션을 값으로 갖는 맵 생성
+	- counting() : 각 키를 해당 키에 속하는 원소의 개수와 매핑한 맵 생성
+		```java
+		Map<String, Long> freq = words.collect(groupingBy(String::toLowerCase, counting()));
+		```
+
+* 다운스트림 수집기에 더해 맵 팩터리도 지정 : 맵과 그 안에 담긴 컬렉션 타입 모두 지정 가능
+	```java
+	Collector<T, ?, M> groupingBy(
+		Function<? super T, ? extends K> classifier, 
+		Supplier<M> mapFactory, 
+		Collector<? super T,A,D> downstream)
+
+	```
+
+* groupingByConcurrent : 위 3개 groupingBy에 각각 대응하는 메서드의 동시 수행 버전, ConcurrentHashMap 인스턴스 생성
+
+
+#### **partitioningBy()**
+분류 함수 자리에 `Predicate` 를 받고, 키가 `Boolean` 인 맵을 반환
+```java
+Stream<String> stream = Stream.of("HTML", "CSS", "JAVA", "PHP");
+ 
+Map<Boolean, List<String>> patition = stream.collect(
+	Collectors.partitioningBy(s -> (s.length() % 2) == 0)
+);
+ 
+List<String> oddLengthList = patition.get(false);
+System.out.println(oddLengthList);
+ 
+List<String> evenLengthList = patition.get(true);
+System.out.println(evenLengthList);
 ```
 
-```java
+#### **minBy(), maxBy()**
+인수로 받은 비교자를 이용해 스트림에서 값이 가장 작은/큰 원소를 찾아 반환
 
+#### **joining()**
+`CharSequence` 인스턴스의 스트림에만 적용 가능
+```java
+String listToString = productList.stream()
+	.map(Product::getName)
+	.collect(Collectors.joining(", ", "<", ">"));
 ```
+* 매개변수가 없는 `joining`은 단순히 원소들을 연결하는 수집기를 반환
+* 1개 인자를 넣으면 구분자를 추가한 문자열 생성
+* 인수 3개 : 접두문자( `[` ) + 구분문자( `,` )  + 접미문자( `]` )
+	> ex) [came, saw, conquered]로 출력
 
 
 ---------------------------------------------------------------
