@@ -317,8 +317,6 @@ BiPredicate<Map<K,V>, Map.Entry<K,V> eldest>
 	- LongStream
 	- DoubleStream
 
-
-
 ### **스트림 연산**
 > 소스 스트림에서 시작해 __종단연산__ 으로 끝나며, 그 사이에 하나 이상의 __중간연산__ 이 있을 수 있다.
 
@@ -337,8 +335,7 @@ BiPredicate<Map<K,V>, Map.Entry<K,V> eldest>
 
 	```java
 	// filter()
-	Stream inp1 = Stream.of(1, 2, 3, 4, 5);
-	Stream sub1 = inp1.filter((val) -> val > 3);
+	IntStream sub1 = IntStream.of(1, 2, 3, 4, 5).filter(val -> val > 3);
 	System.out.println(sub1.count());	// 2
 
 	// map()
@@ -349,21 +346,20 @@ BiPredicate<Map<K,V>, Map.Entry<K,V> eldest>
 	// flatMap()
 	String[] arr = {"I study hard", "You study JAVA", "I am hungry"};
 	Stream<String> inp3 = Arrays.stream(arr);
-	Stream sub3 = inp3.flatMap(list -> list.stream());
-	//sub3.forEach(System.out::println);
-	System.out.println(sub3.distinct().count()); // 3
+	inp3.flatMap(s -> Stream.of(s.split(" "))).distinct().forEach(System.out::println);
 
 	// Stream sorted()
-	Stream.of("tomoto", "Green Chilli", "Pototo", "Beet root")
-		.sorted().forEach(System.out::println); // Beet root\nGreen Chilli\nPototo\ntomoto
+	Stream.of("[tomoto]", "[Green Chilli]", "[Pototo]", "[Beet root]")
+		.sorted().forEach(System.out::print); // [Beet root][Green Chilli][Pototo][tomoto]
 		
 	// Stream limit​(long maxSize)
-	Stream.of("one", "two", "three", "four")
-		.limit(2).forEach(System.out::println); // one\ntwo
+	Stream.of("[one]", "[two]", "[three]", "[four]")
+		.limit(2).forEach(System.out::print); // [one][two]
 	
 	// Stream skip​(long n)
-	Stream.of("one", "two", "three", "four", "five")
-		.skip(2).forEach(System.out::println); // three\nfour\nfive
+	Stream.of("[one]", "[two]", "[three]", "[four]", "[five]")
+		.skip(2).forEach(System.out::print); // [three][four][five]
+
 	```
 
 * __종단 연산 (terminal operation)__
@@ -385,28 +381,24 @@ BiPredicate<Map<K,V>, Map.Entry<K,V> eldest>
 
 
 	```java
-	Stream.of("넷", "둘", "셋", "하나").forEach(System.out::println);
-
-	Stream.of("넷", "둘", "셋", "하나")
-		.reduce((s1, s2) -> s1 + "++" + s2).ifPresent(System.out::println);
-
-	Stream.of("넷", "둘", "셋", "하나")
-		.reduce("시작", (s1, s2) -> s1 + "++" + s2).ifPresent(System.out::println);
-
-	System.out.println(IntStream.of(30, 90, 70, 10).anyMatch(n -> n > 80)); // true
-	System.out.println(IntStream.of(30, 90, 70, 10).allMatch(n -> n > 80)); // false
-
-	System.out.println(IntStream.of(30, 90, 70, 10).count()); // 4
-	System.out.println(IntStream.of(30, 90, 70, 10).sum()); // 200
-
-	System.out.println(IntStream.of(30, 90, 70, 10).max().getAsInt()); // 90
-	System.out.println(DoubleStream.of(30.3, 90.9, 70.7, 10.1).average().getAsDouble()); // 50.5
-
-	Map<Boolean, List<String>> part = Stream.of("HTML", "CSS", "JAVA", "PHP")
-					.collect(Collectors.partitioningBy(s -> (s.length() % 2) == 0));
-	List<String> oddLengthList = part.get(false); System.out.println(oddLengthList);
-	List<String> evenLengthList = part.get(true); System.out.println(evenLengthList);
-
+		Stream.of("[넷]", "[둘]", "[셋]", "[하나]").forEach(System.out::println);
+		Stream.of("[넷]", "[둘]", "[셋]", "[하나]")
+			.reduce((s1, s2) -> s1 + "++" + s2).ifPresent(System.out::println);
+		System.out.println(Stream.of("[넷]", "[둘]", "[셋]", "[하나]").reduce("시작", (s1, s2) -> s1 + "++" + s2));
+	
+		System.out.println(IntStream.of(30, 90, 70, 10).anyMatch(n -> n > 80)); // true
+		System.out.println(IntStream.of(30, 90, 70, 10).allMatch(n -> n > 80)); // false
+	
+		System.out.println(IntStream.of(30, 90, 70, 10).count()); // 4
+		System.out.println(IntStream.of(30, 90, 70, 10).sum()); // 200
+	
+		System.out.println(IntStream.of(30, 90, 70, 10).max().getAsInt()); // 90
+		System.out.println(DoubleStream.of(30.3, 90.9, 70.7, 10.1).average().getAsDouble()); // 50.5
+	
+		Map<Boolean, List<String>> part = Stream.of("HTML", "CSS", "JAVA", "PHP")
+						.collect(Collectors.partitioningBy(s -> (s.length() % 2) == 0));
+		List<String> oddlst = part.get(false); System.out.println(oddlst); // [CSS, PHP]
+		List<String> evenlst = part.get(true); System.out.println(evenlst); // [HTML, JAVA]
 	```
 
 ### **지연 평가(Lazy evaluation)**
@@ -463,10 +455,31 @@ Stream을 적절히 활용한 코드
 
 [[TOC]](#목차)
 
-### **gggg**
+### **스트림 패러다임**
 
+스트림을 제대로 활용한 코드
 ```java
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 
+public class I46_Stream {
+	public static void main(String[] args) throws FileNotFoundException {
+		File file = new File("D:/temp/README.txt");
+		Map<String, Long> freq;
+		try (Stream<String> words = new Scanner(file).tokens()) {
+			freq = words.collect(groupingBy(String::toLowerCase, counting()));
+		}
+		System.out.println(freq);
+
+		List<String> topTen = freq.keySet().stream() 
+			.sorted(comparing(freq::get).reversed()) 
+			.limit(10).collect(toList());
+
+		topTen.stream().forEach(System.out::println);
+	}
+}
 ```
 
 ```java
