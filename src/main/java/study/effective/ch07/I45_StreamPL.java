@@ -15,8 +15,8 @@ public class I45_StreamPL {
 		System.out.println(sub1.count());	// 2
 
 		// map()
-		Stream inp2 = Stream.of("Welcome", "To", "java", "blog");
-		Stream sub2 = inp2.map(str -> { return (str.equals("java"))? "Insjang" : str; });
+		Stream<String> inp2 = Stream.of("Welcome", "To", "java", "blog");
+		Stream<String> sub2 = inp2.map(str -> { return (str.equals("java"))? "Insjang" : str; });
 		System.out.println(sub2.collect(Collectors.toList())); // [Welcome, To, Insjang, blog]
 
 		// flatMap()

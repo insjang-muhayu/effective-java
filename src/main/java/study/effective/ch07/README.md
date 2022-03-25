@@ -632,6 +632,17 @@ String listToString = productList.stream()
 
 [[TOC]](#목차)
 
+### **자바8 이전 목록 자료구조 반환 타입**
+* __`Collection` 인터페이스__ : 
+	> 기본적으로 사용 (`Collection`, `Set`, `List`)
+* __`E[]` 와 같은 배열__ :
+	> 반환 원소가 기본 타입이거나, 성능이 중요시될 때 사용
+* __`Iterable` 인터페이스__ :
+	> `for-each`문에서만 사용되거나, 일부 `Collection`을 구현할 수 없을 때 사용
+
+### **Stream은 반복(loop)을 지원 안함**
+
+
 ### **gggg**
 
 ```java
