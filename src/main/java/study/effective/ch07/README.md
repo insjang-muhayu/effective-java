@@ -640,10 +640,49 @@ String listToString = productList.stream()
 * __`Iterable` 인터페이스__ :
 	> `for-each`문에서만 사용되거나, 일부 `Collection`을 구현할 수 없을 때 사용
 
-### **Stream은 반복(loop)을 지원 안함**
+### **Stream 반복문**
+`Stream` 은 반복(Iterable)을 지원하지 않기 때문에 `for-each`를 사용하기 위해서 다음 방식을 사용
+* `Stream::iterator()` 사용
+* `Stream -> Iterable` 어댑터
+* `Iterable -> Stream` 어댑터
 
 
-### **gggg**
+```java
+public class I47_StreamIter {
+	// Stream -> Iterable 어댑터
+	public static <E> Iterable<E> iterableOf(Stream<E> stream) {
+		return stream::iterator;
+	}
+
+	// Iterable -> Stream 어댑터
+	public static <E> Stream<E> streamOf(Iterable<E> iterable){
+		return StreamSupport.stream(iterable.spliterator(), false);
+	}
+
+	public static void main(String[] args) {
+		Stream<String> dev2u = Stream.of("장인순", "이민승", "최혜환", "이규명");
+
+		System.out.println("\n1. Stream iterator() 사용");
+		for (String member : (Iterable<String>) dev2u::iterator) { // 형변환
+			System.out.println(member);
+		}
+
+		// [빈번한 실수] 스트림은 재사용할 수 없다. 오직 한번만 사용
+		// Stream dev2u 재사용하면 다음과 같은 오류 발생
+		//	--> java.lang.IllegalStateException: stream has already been operated upon or closed
+		Stream<String> dev4u = Stream.of("이강원", "최유빈");
+		System.out.println("\n2. Stream -> Iterable 어댑터");
+		for (String member : iterableOf(dev4u)) { // 어댑터 메소드 사용
+			System.out.println(member);
+		}
+
+		Iterable<String> dev8u = Arrays.asList("장인순", "이민승", "최혜환", "이규명", "이강원", "최유빈");
+		System.out.println("\n3. Iterable -> Stream 어댑터");
+		streamOf(dev8u).forEach(System.out::println);
+	}
+}
+```
+### **전용 컬렉션 구현**
 
 ```java
 
