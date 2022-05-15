@@ -683,22 +683,47 @@ public class I47_StreamIter {
 }
 ```
 ### **전용 컬렉션 구현**
+반환할 시퀀스가 크지만 표현을 간결하게 할 수 있다면 __전용컬렉션__ 을 구현하는 방안을 검토
 
+#### **[ `AbstractList` 활용 전용컬렉션 구현 ]**
 ```java
+public class I47_PowerSet {
+	public static final <E> Collection<Set<E>> of(Set<E> s) {
+		List<E> src = new ArrayList<>(s);
+		if (src.size() > 30) throw new IllegalArgumentException("Set too big (MAX:30) : " + s);
+		
+		return new AbstractList<Set<E>>() {
+			@Override public int size() {
+				return 1 << src.size(); // 2 to the power srcSize
+			}
+			@Override public boolean contains(Object obj) {
+				return obj instanceof Set && src.containsAll((Set)obj);
+			}
+			@Override public Set<E> get(int index) {
+				Set<E> result = new HashSet<>();
+				for (int i = 0; index != 0; i++, index >>= 1) {
+					if ((index & 1) == 1) result.add(src.get(i));
+				}
+				return result;
+			}
+		};
+	}
 
+	public static void main(String[] args) {
+		Set<String> dev2u = new HashSet(Arrays.asList("장인순", "이민승", "최혜환", "이규명"));
+		System.out.println(dev2u);
+		Collection<Set<String>> memberJoins = I47_PowerSet.of(dev2u);		
+		for (Set<String> member : memberJoins) {
+			System.out.println(member);
+		}
+	}
+}
 ```
 
-```java
-
-```
-
-```java
-
-```
-
-```java
-
-```
+#### **`AbstractCollection` 활용한 Collection 구현체의 필수 구현 메서드**
+* `Iterable`용 메서드
+* `contains`
+* `size`
 
 
 ---------------------------------------------------------------
@@ -707,24 +732,62 @@ public class I47_StreamIter {
 
 [[TOC]](#목차)
 
-### **gggg**
+### **Java 동시성 프로그래밍**
+* Java5 : `java.util.concurrent`, `Executor`
+* Java7 : 고성능 병렬 분해(parallel decom-position) 프레임워크 `fork-join`
+* Java8 : Stream의 `parallel` 메서드
 
+### **안정성과 응답가능 상태 유지**
+
+#### **[ Stream Pipeline 병렬화 사용시 성능 악화 예시 ]**
+데이터 소스가 `Stream.iterate()` 이거나 중간연산으로 `limit()`을 사용하면 파이프라인 병렬화로는 성능 개선 불가
 ```java
+	public static void main(String[] args) {
+		primes().map(p -> TWO.pow(p.intValueExact()).subtract(ONE))
+			.filter(mersenne -> mersenne.isProbablePrime(50))
+			.limit(20)
+			.forEach(System.out::println);
+	}
 
+	static Stream<BigInteger> primes() {
+		return Stream.iterate(TWO, BigInteger::nextProbablePrime);
+	}
 ```
 
-```java
+### **병렬화 하기 좋은 경우**
 
+#### **[ 참조 지역성이 뛰어난 경우 ]**
+```
+	* ArrayList 
+	* HashMap
+	* HashSet
+	* ConcurrentHashMap
+	* 배열
+	* int 범위
+	* long 범위
 ```
 
-```java
+- 위 자료구조들은 모두 데이터를 원하는 크기로 정확하고 쉽게 나눌 수 있어, 일을 다수의 스레드에 분배하기 좋다. 
+- 원소들을 순차적으로 실행할 때 참조지역성이 우수함 (참조지역성 : 이웃한 원소의 참조들이 메모리에 연속해서 저장) 
+- 참조지역성이 낮으면 스레드는 데이터가 주 메모리에서 캐시 메모리로 전송되어 오기를 기다리며 대부분 시간을 낭비하며 보내게 되며, 
+- 참조 지역성은 대량의 데이터를 처리하는 벌크 연산을 병렬화 할 때 아주 중요한 요소로 작용한다. 
+- 기본 타입의 배열은 데이터 자체가 메모리에 연속해서 저장되기 때문에 참조 지역성이 가장 뛰어나 병렬화 효과가 가장 좋다.
 
-```
+#### **[ 종단 연산 - 축소(reduction) ]**
 
-```java
+종단 연산에서 수행하는 작업량이 파이프라인 전체 작업에서 상당 비중으로 차지하며, 순차적인 연산이라면 파이프라인 병렬 수행의 효과는 제한될 수 밖에 없다.
+축소(reduction)는 파이프라인에서 만들어진 모든 원소를 하나로 합치는 작업이다.
+* reduce 메서드
+* min, max, count, sum 완성된 형태로 제공되는 메서드
+* anyMatch, allMatch, noneMatch 와 같이 조건에 맞으면 바로 반환하는 메서드
 
-```
+위 메서드는 병렬화에 적합하지만, 가변 축소를 수행하는 Stream의 collect 메서드는 컬렉션들을 합치는 부담이 크기때문에 병렬화에 적합하지 않다.
 
+#### **[ spliterator 메서드 재정의 ]**
+
+직접 구현한 Stream, Iterable, Collection이 병렬화 이점을 제대로 누리게 하려면 spliterator 메서드를 반드시 재정의하고 결과 스트림의 병렬화 성능을 강도 높게 테스트하는 것이 좋다.
+
+하지만, spliterator 메서드를 재정의 하는 것은 난이도가 있으며, 지금은 다루지 않고, 나중에 기회가 된다면 더 공부해볼 것이다!
 
 ---------------------------------------------------------------
 
